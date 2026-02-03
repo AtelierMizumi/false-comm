@@ -2,10 +2,26 @@ name: Automated Tests
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "main", "dev" ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
+    inputs:
+      run_all_tests:
+        description: 'Run all tests including integration'
+        required: false
+        default: true
+        type: boolean
+      platform:
+        description: 'Platform to test'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - ubuntu
+          - windows
+          - macos
 
 jobs:
   test:
