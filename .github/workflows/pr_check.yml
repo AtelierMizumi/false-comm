@@ -1,0 +1,170 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches: [ "main" ]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  # ============================================
+  # PR VALIDATION
+  # ============================================
+  validate:
+    name: 📋 Validate PR
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check PR title format
+        run: |
+          TITLE="${{ github.event.pull_request.title }}"
+          echo "PR Title: $TITLE"
+          
+          # Check for conventional commit format (optional but recommended)
+          if [[ "$TITLE" =~ ^(feat|fix|docs|style|refactor|test|chore|build|ci)(\(.+\))?: ]]; then
+            echo "✅ PR title follows conventional format"
+          else
+            echo "⚠️ Consider using conventional commit format:"
+            echo "   feat: add new feature"
+            echo "   fix: bug fix"
+            echo "   docs: documentation"
+            echo "   refactor: code refactoring"
+            echo "   test: add tests"
+            echo "   chore: maintenance"
+          fi
+
+      - name: Check for breaking changes
+        run: |
+          echo "## 📋 PR Validation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # List changed files
+          CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
+          echo "### Changed Files" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "$CHANGED_FILES" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          
+          # Check for potentially breaking changes
+          if echo "$CHANGED_FILES" | grep -q "lib/domain/models.dart"; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ **Warning:** \`models.dart\` was modified - check for breaking changes!" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if echo "$CHANGED_FILES" | grep -q "pubspec.yaml"; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "📦 **Note:** Dependencies were modified" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # ============================================
+  # FULL TEST SUITE
+  # ============================================
+  test-all:
+    name: 🧪 Full Test Suite
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze --fatal-infos
+
+      - name: Run all tests with coverage
+        run: flutter test --coverage --reporter expanded
+
+      - name: Check test coverage
+        run: |
+          if [ -f coverage/lcov.info ]; then
+            # Count lines covered
+            LINES=$(grep -c "DA:" coverage/lcov.info || echo "0")
+            echo "📊 Coverage: $LINES lines instrumented"
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 📊 Test Coverage" >> $GITHUB_STEP_SUMMARY
+            echo "Lines instrumented: **$LINES**" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # ============================================
+  # BUILD VERIFICATION
+  # ============================================
+  build-verify:
+    name: 🔨 Build Verification
+    needs: [validate, test-all]
+    runs-on: ${{ matrix.os }}
+    if: github.event.pull_request.draft == false
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+          - os: windows-latest
+            platform: windows
+          - os: macos-latest
+            platform: macos
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux deps
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libgtk-3-dev
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Build
+        run: |
+          flutter config --enable-${{ matrix.platform }}-desktop
+          flutter pub get
+          flutter build ${{ matrix.platform }} --release
+
+  # ============================================
+  # PR READY CHECK
+  # ============================================
+  ready-to-merge:
+    name: ✅ Ready to Merge
+    needs: [validate, test-all, build-verify]
+    runs-on: ubuntu-latest
+    if: always() && github.event.pull_request.draft == false
+    
+    steps:
+      - name: Check all jobs
+        run: |
+          if [ "${{ needs.validate.result }}" != "success" ] || \
+             [ "${{ needs.test-all.result }}" != "success" ] || \
+             [ "${{ needs.build-verify.result }}" != "success" ]; then
+            echo "❌ Some checks failed"
+            exit 1
+          fi
+          echo "✅ All checks passed - PR is ready to merge!"
+
+      - name: Summary
+        run: |
+          echo "# ✅ PR Ready to Merge" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Validation | ${{ needs.validate.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | ${{ needs.test-all.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Builds | ${{ needs.build-verify.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**All checks passed!** This PR can be safely merged. 🎉" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,106 @@
+name: Dev Build
+
+on:
+  push:
+    branches: [ "dev" ]
+  workflow_dispatch:
+    inputs:
+      upload_artifacts:
+        description: 'Upload build artifacts'
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  # ============================================
+  # DEV BUILDS - Create artifacts for testing
+  # ============================================
+  build:
+    name: 🔧 Dev Build (${{ matrix.platform }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            artifact: build/linux/x64/release/bundle
+          - os: windows-latest
+            platform: windows
+            artifact: build/windows/x64/runner/Release
+          - os: macos-latest
+            platform: macos
+            artifact: build/macos/Build/Products/Release
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux deps
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libgtk-3-dev
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Build
+        run: |
+          flutter config --enable-${{ matrix.platform }}-desktop
+          flutter pub get
+          flutter build ${{ matrix.platform }} --release --build-name=dev-${{ github.run_number }} --build-number=${{ github.run_number }}
+
+      - name: Package (Linux)
+        if: matrix.platform == 'linux'
+        run: |
+          cd build/linux/x64/release
+          tar -czf ../../../../FakeComm-dev-${{ github.run_number }}-linux.tar.gz -C bundle .
+
+      - name: Package (Windows)
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "build\windows\x64\runner\Release\*" -DestinationPath "FakeComm-dev-${{ github.run_number }}-windows.zip"
+
+      - name: Package (macOS)
+        if: matrix.platform == 'macos'
+        run: |
+          cd build/macos/Build/Products/Release
+          zip -r ../../../../../FakeComm-dev-${{ github.run_number }}-macos.zip *.app
+
+      - name: Upload artifact
+        if: inputs.upload_artifacts != false
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-${{ matrix.platform }}-${{ github.run_number }}
+          path: FakeComm-dev-${{ github.run_number }}-*
+          retention-days: 7
+
+  # ============================================
+  # SUMMARY
+  # ============================================
+  summary:
+    name: 📋 Build Summary
+    needs: [build]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Generate summary
+        run: |
+          echo "# 🔧 Dev Build #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Build artifacts are available for 7 days:" >> $GITHUB_STEP_SUMMARY
+          echo "- 🐧 \`dev-linux-${{ github.run_number }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- 🪟 \`dev-windows-${{ github.run_number }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- 🍎 \`dev-macos-${{ github.run_number }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "⚠️ These are development builds - not for production use!" >> $GITHUB_STEP_SUMMARY

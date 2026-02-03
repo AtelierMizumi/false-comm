@@ -1,0 +1,214 @@
+name: Release
+
+on:
+  push:
+    branches: [ "main" ]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g., 1.0.0). Leave empty for auto-version'
+        required: false
+        type: string
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        default: false
+        type: boolean
+      draft:
+        description: 'Create as draft'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  VERSION: ${{ inputs.version || format('1.0.{0}', github.run_number) }}
+
+jobs:
+  # ============================================
+  # BUILD LINUX
+  # ============================================
+  build-linux:
+    name: 🐧 Build Linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libgtk-3-dev patchelf
+
+      - name: Build
+        run: |
+          flutter config --enable-linux-desktop
+          flutter pub get
+          flutter build linux --release --build-name=${{ env.VERSION }} --build-number=${{ github.run_number }}
+
+      - name: Package
+        run: |
+          cd build/linux/x64/release/bundle
+          
+          # Create launcher script
+          cat > fakecomm << 'LAUNCHER'
+          #!/bin/bash
+          SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+          cd "$SCRIPT_DIR"
+          export LD_LIBRARY_PATH="$SCRIPT_DIR/lib:$LD_LIBRARY_PATH"
+          exec "$SCRIPT_DIR/fake_comm_gui" "$@"
+          LAUNCHER
+          chmod +x fakecomm
+          
+          cd ..
+          tar -czf ../../../../FakeComm-${{ env.VERSION }}-Linux-x86_64.tar.gz -C bundle .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-build
+          path: FakeComm-${{ env.VERSION }}-Linux-x86_64.tar.gz
+
+  # ============================================
+  # BUILD WINDOWS
+  # ============================================
+  build-windows:
+    name: 🪟 Build Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Build
+        run: |
+          flutter config --enable-windows-desktop
+          flutter pub get
+          flutter build windows --release --build-name=${{ env.VERSION }} --build-number=${{ github.run_number }}
+
+      - name: Package
+        shell: pwsh
+        run: |
+          cd build\windows\x64\runner\Release
+          
+          # Rename executable
+          if (Test-Path "fake_comm_gui.exe") {
+            Rename-Item "fake_comm_gui.exe" "FakeComm.exe"
+          }
+          
+          # Create README
+          @"
+          FakeComm v${{ env.VERSION }} - Windows
+          =====================================
+          
+          Run: Double-click FakeComm.exe
+          
+          Requirements: Git must be installed
+          "@ | Set-Content "README.txt" -Encoding UTF8
+          
+          cd ..\..\..\..
+          Compress-Archive -Path "windows\x64\runner\Release\*" -DestinationPath "FakeComm-${{ env.VERSION }}-Windows-x64.zip" -Force
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: build/FakeComm-${{ env.VERSION }}-Windows-x64.zip
+
+  # ============================================
+  # BUILD MACOS
+  # ============================================
+  build-macos:
+    name: 🍎 Build macOS
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Build
+        run: |
+          flutter config --enable-macos-desktop
+          flutter pub get
+          flutter build macos --release --build-name=${{ env.VERSION }} --build-number=${{ github.run_number }}
+
+      - name: Package
+        run: |
+          cd build/macos/Build/Products/Release
+          zip -r ../../../../../FakeComm-${{ env.VERSION }}-macOS.zip *.app
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: FakeComm-${{ env.VERSION }}-macOS.zip
+
+  # ============================================
+  # CREATE RELEASE
+  # ============================================
+  release:
+    name: 📦 Create Release
+    needs: [build-linux, build-windows, build-macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: List artifacts
+        run: find artifacts -type f
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: FakeComm v${{ env.VERSION }}
+          draft: ${{ inputs.draft || false }}
+          prerelease: ${{ inputs.prerelease || false }}
+          generate_release_notes: true
+          body: |
+            ## 🎭 FakeComm v${{ env.VERSION }}
+            
+            Generate realistic fake Git commit histories for your repositories!
+            
+            ### 📥 Downloads
+            
+            | Platform | File | Instructions |
+            |----------|------|--------------|
+            | 🪟 Windows | `FakeComm-${{ env.VERSION }}-Windows-x64.zip` | Extract → Run `FakeComm.exe` |
+            | 🐧 Linux | `FakeComm-${{ env.VERSION }}-Linux-x86_64.tar.gz` | Extract → Run `./fakecomm` |
+            | 🍎 macOS | `FakeComm-${{ env.VERSION }}-macOS.zip` | Extract → Open `.app` |
+            
+            ### ✨ Features
+            
+            - 🎯 5-step wizard: Repository → Identity → Behavior → Preview → Execute
+            - 📊 Poisson/Normal distribution sampling
+            - 🗓️ Holiday presets (Vietnam, USA, Japan, Korea, EU)
+            - ⚖️ Customizable weekday weights & monthly trends
+            - 🕐 Intra-day time windows (work hours)
+            - 📈 GitHub contribution history import
+            - ↩️ Undo with snapshot restore
+            - 🔥 GitHub-style heatmap preview
+            
+            ### ⚠️ Requirements
+            
+            - **Git** must be installed on your system
+            
+            ---
+            *Built with Flutter 💙*
+          files: |
+            artifacts/**/*
