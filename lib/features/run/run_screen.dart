@@ -88,8 +88,10 @@ class _RunScreenState extends ConsumerState<RunScreen> {
                           const Divider(),
                           _buildInfoRow('Repository', repoConfig.path),
                           _buildInfoRow('Branch', repoConfig.branch),
-                          _buildInfoRow('Author', '${identityConfig.username} <${identityConfig.email}>'),
-                          _buildInfoRow('Total Commits', '${plan.totalCommits}'),
+                          _buildInfoRow('Author',
+                              '${identityConfig.username} <${identityConfig.email}>'),
+                          _buildInfoRow(
+                              'Total Commits', '${plan.totalCommits}'),
                           _buildInfoRow('Active Days', '${plan.activeDays}'),
                           _buildInfoRow(
                             'Date Range',
@@ -117,7 +119,8 @@ class _RunScreenState extends ConsumerState<RunScreen> {
                           const Divider(),
                           SwitchListTile(
                             contentPadding: EdgeInsets.zero,
-                            title: const Text('Push to remote after completion'),
+                            title:
+                                const Text('Push to remote after completion'),
                             subtitle: Text(
                               repoConfig.remoteUrl ?? 'No remote configured',
                               style: theme.textTheme.bodySmall,
@@ -164,8 +167,10 @@ class _RunScreenState extends ConsumerState<RunScreen> {
                   CheckboxListTile(
                     value: _confirmed,
                     onChanged: (v) => setState(() => _confirmed = v ?? false),
-                    title: const Text('I understand this will modify my repository'),
-                    subtitle: const Text('Commits can be undone using the history feature'),
+                    title: const Text(
+                        'I understand this will modify my repository'),
+                    subtitle: const Text(
+                        'Commits can be undone using the history feature'),
                     controlAffinity: ListTileControlAffinity.leading,
                   ),
                 ],
@@ -270,7 +275,8 @@ class _RunScreenState extends ConsumerState<RunScreen> {
                 _buildResultRow('Commits Created', '${result.successCount}'),
                 if (result.failCount > 0)
                   _buildResultRow('Failed', '${result.failCount}'),
-                _buildResultRow('Files Created', '${result.filesCreated.length}'),
+                _buildResultRow(
+                    'Files Created', '${result.filesCreated.length}'),
                 _buildResultRow('Pushed', result.pushed ? 'Yes' : 'No'),
                 if (result.pushError != null)
                   Padding(

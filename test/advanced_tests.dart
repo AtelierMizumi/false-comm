@@ -11,7 +11,15 @@ void main() {
       final config = BehaviorConfig(
         dateRange: DateRange(DateTime(2024, 1, 1), DateTime(2024, 1, 1)),
         averageIntensity: 3.0,
-        weekdayWeights: {1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0.3, 7: 0.2},
+        weekdayWeights: {
+          1: 1.0,
+          2: 1.0,
+          3: 1.0,
+          4: 1.0,
+          5: 1.0,
+          6: 0.3,
+          7: 0.2
+        },
         monthlyTrend: List.filled(12, 1.0),
         samplingMode: SamplingMode.poisson,
         minPerDay: 0,
@@ -28,11 +36,19 @@ void main() {
         10,
         (i) => DateTime(2024, 1, i + 1),
       );
-      
+
       final config = BehaviorConfig(
         dateRange: DateRange(DateTime(2024, 1, 1), DateTime(2024, 1, 10)),
         averageIntensity: 5.0,
-        weekdayWeights: {1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0},
+        weekdayWeights: {
+          1: 1.0,
+          2: 1.0,
+          3: 1.0,
+          4: 1.0,
+          5: 1.0,
+          6: 1.0,
+          7: 1.0
+        },
         monthlyTrend: List.filled(12, 1.0),
         samplingMode: SamplingMode.poisson,
         minPerDay: 0,
@@ -41,7 +57,7 @@ void main() {
       );
 
       final plan = engine.generatePlan(config, ['test']);
-      
+
       // All days should be marked as holidays
       for (final day in plan.days) {
         expect(day.isHoliday, true);
@@ -52,7 +68,15 @@ void main() {
       final config = BehaviorConfig(
         dateRange: DateRange(DateTime(2024, 1, 1), DateTime(2024, 1, 30)),
         averageIntensity: 5.0,
-        weekdayWeights: {1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0},
+        weekdayWeights: {
+          1: 1.0,
+          2: 1.0,
+          3: 1.0,
+          4: 1.0,
+          5: 1.0,
+          6: 1.0,
+          7: 1.0
+        },
         monthlyTrend: List.filled(12, 1.0),
         samplingMode: SamplingMode.normal,
         minPerDay: 0,
@@ -69,7 +93,15 @@ void main() {
       final config = BehaviorConfig(
         dateRange: DateRange(DateTime(2024, 1, 1), DateTime(2024, 1, 10)),
         averageIntensity: 0.0,
-        weekdayWeights: {1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0},
+        weekdayWeights: {
+          1: 1.0,
+          2: 1.0,
+          3: 1.0,
+          4: 1.0,
+          5: 1.0,
+          6: 1.0,
+          7: 1.0
+        },
         monthlyTrend: List.filled(12, 1.0),
         samplingMode: SamplingMode.poisson,
         minPerDay: 0,
@@ -92,7 +124,15 @@ void main() {
       final config = BehaviorConfig(
         dateRange: DateRange(DateTime(2024, 1, 15), DateTime(2024, 2, 15)),
         averageIntensity: 5.0,
-        weekdayWeights: {1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0},
+        weekdayWeights: {
+          1: 1.0,
+          2: 1.0,
+          3: 1.0,
+          4: 1.0,
+          5: 1.0,
+          6: 1.0,
+          7: 1.0
+        },
         monthlyTrend: monthlyTrend,
         samplingMode: SamplingMode.poisson,
         minPerDay: 0,
@@ -101,7 +141,7 @@ void main() {
       );
 
       final plan = engine.generatePlan(config, ['test']);
-      
+
       final januaryCommits = plan.days
           .where((d) => d.day.month == 1)
           .fold<int>(0, (sum, d) => sum + d.count);
@@ -144,10 +184,10 @@ void main() {
         endHour: 23,
         endMinute: 59,
       );
-      
+
       final day = DateTime(2024, 1, 15);
       final time = window.randomTimeOn(day, 0.5);
-      
+
       expect(time.hour >= 22, true);
     });
 
@@ -158,7 +198,7 @@ void main() {
         endHour: 12,
         endMinute: 1,
       );
-      
+
       expect(window.durationMinutes, 1);
     });
 
@@ -169,7 +209,7 @@ void main() {
         endHour: 23,
         endMinute: 59,
       );
-      
+
       expect(window.durationMinutes, 23 * 60 + 59);
     });
   });
@@ -190,7 +230,7 @@ void main() {
         hasLunchGap: false,
         lateNightProbability: 0.05,
       );
-      
+
       expect(config.workWindows.length, 2);
       expect(config.hasLunchGap, false);
       expect(config.lateNightProbability, 0.05);
@@ -214,7 +254,7 @@ void main() {
         ],
         isWeekend: false,
       );
-      
+
       expect(day.count, 3);
     });
 
@@ -224,7 +264,7 @@ void main() {
         commits: [],
         isWeekend: false,
       );
-      
+
       expect(day.count, 0);
     });
 
@@ -235,7 +275,7 @@ void main() {
         isWeekend: false,
         isHoliday: true,
       );
-      
+
       expect(day.isHoliday, true);
     });
   });
@@ -243,7 +283,7 @@ void main() {
   group('AppState Tests', () {
     test('default state is correct', () {
       const state = AppState();
-      
+
       expect(state.currentStep, AppStep.repoPicker);
       expect(state.repoConfig.path, '');
       expect(state.identityConfig.username, '');
@@ -253,7 +293,7 @@ void main() {
     test('copyWith preserves unchanged fields', () {
       const state = AppState();
       final newState = state.copyWith(currentStep: AppStep.identity);
-      
+
       expect(newState.currentStep, AppStep.identity);
       expect(newState.repoConfig.path, state.repoConfig.path);
     });
@@ -264,7 +304,7 @@ void main() {
         isRunning: true,
         errorMessage: 'Test error',
       );
-      
+
       expect(newState.isRunning, true);
       expect(newState.errorMessage, 'Test error');
     });
@@ -277,15 +317,15 @@ void main() {
         branch: 'main',
         isValid: true,
       );
-      
+
       expect(validConfig.isValid, true);
-      
+
       const invalidConfig = RepoConfig(
         path: '',
         branch: '',
         isValid: false,
       );
-      
+
       expect(invalidConfig.isValid, false);
     });
 
@@ -298,7 +338,7 @@ void main() {
         gitVersion: '2.40.0',
         isDirty: true,
       );
-      
+
       expect(config.remoteUrl, 'https://github.com/user/repo.git');
       expect(config.gitVersion, '2.40.0');
       expect(config.isDirty, true);
@@ -324,7 +364,7 @@ void main() {
         username: 'newuser',
         email: 'new@example.com',
       );
-      
+
       expect(updated.username, 'newuser');
       expect(updated.email, 'new@example.com');
       expect(updated.timezone, 'Asia/Ho_Chi_Minh'); // unchanged
@@ -388,7 +428,7 @@ void main() {
     test('defaultConfig creates valid config', () {
       final range = DateRange(DateTime(2024, 1, 1), DateTime(2024, 12, 31));
       final config = BehaviorConfig.defaultConfig(range);
-      
+
       expect(config.dateRange, range);
       expect(config.averageIntensity, 3.0);
       expect(config.samplingMode, SamplingMode.poisson);

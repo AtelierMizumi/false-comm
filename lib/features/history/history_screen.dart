@@ -71,7 +71,9 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     }
 
     // Perform undo
-    await ref.read(undoProvider.notifier).performUndo(snapshot, forcePush: forcePush);
+    await ref
+        .read(undoProvider.notifier)
+        .performUndo(snapshot, forcePush: forcePush);
     final result = ref.read(undoProvider).result;
 
     if (mounted) {
@@ -83,7 +85,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Undo failed: ${result?.errors.join(', ') ?? 'Unknown error'}'),
+            content: Text(
+                'Undo failed: ${result?.errors.join(', ') ?? 'Unknown error'}'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -179,7 +182,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                         separatorBuilder: (_, __) => const Divider(height: 1),
                         itemBuilder: (context, index) {
                           final snapshot = history[index];
-                          final isSelected = _selectedSnapshot?.id == snapshot.id;
+                          final isSelected =
+                              _selectedSnapshot?.id == snapshot.id;
 
                           return _buildSnapshotTile(
                             theme,
@@ -311,12 +315,15 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildDetailRow('ID', snapshot.id),
-                    _buildDetailRow('Created', dateFormat.format(snapshot.createdAt)),
+                    _buildDetailRow(
+                        'Created', dateFormat.format(snapshot.createdAt)),
                     _buildDetailRow('Status', _statusLabel(snapshot.status)),
                     _buildDetailRow('Branch', snapshot.branch),
-                    _buildDetailRow('Total Commits', '${snapshot.totalCommits}'),
+                    _buildDetailRow(
+                        'Total Commits', '${snapshot.totalCommits}'),
                     _buildDetailRow('Pushed', snapshot.pushed ? 'Yes' : 'No'),
-                    _buildDetailRow('Head Commit (before)', snapshot.headCommit),
+                    _buildDetailRow(
+                        'Head Commit (before)', snapshot.headCommit),
                     const SizedBox(height: 16),
                     Text(
                       'Files Created (${snapshot.filesCreated.length})',

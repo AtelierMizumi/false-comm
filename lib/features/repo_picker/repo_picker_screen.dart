@@ -232,7 +232,8 @@ class _RepoPickerScreenState extends ConsumerState<RepoPickerScreen> {
                 padding: const EdgeInsets.only(top: 8),
                 child: Row(
                   children: [
-                    Icon(Icons.warning, color: theme.colorScheme.tertiary, size: 20),
+                    Icon(Icons.warning,
+                        color: theme.colorScheme.tertiary, size: 20),
                     const SizedBox(width: 8),
                     Text(
                       'Repository has uncommitted changes',

@@ -15,7 +15,8 @@ class BehaviorConfigScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<BehaviorConfigScreen> createState() => _BehaviorConfigScreenState();
+  ConsumerState<BehaviorConfigScreen> createState() =>
+      _BehaviorConfigScreenState();
 }
 
 class _BehaviorConfigScreenState extends ConsumerState<BehaviorConfigScreen> {
@@ -107,9 +108,8 @@ class _BehaviorConfigScreenState extends ConsumerState<BehaviorConfigScreen> {
     final contentGen = ref.read(contentGeneratorProvider);
     final profile = ref.read(contributionProfileProvider);
 
-    final configToUse = profile != null
-        ? engine.blendWithProfile(config, profile)
-        : config;
+    final configToUse =
+        profile != null ? engine.blendWithProfile(config, profile) : config;
 
     final plan = engine.generatePlan(configToUse, contentGen.commitMessages);
     ref.read(appStateProvider.notifier).setPlanSummary(plan);
@@ -195,7 +195,8 @@ class _BehaviorConfigScreenState extends ConsumerState<BehaviorConfigScreen> {
                   const SizedBox(height: 16),
 
                   // Weekday Weights
-                  _buildSectionHeader('Weekday Weights', Icons.calendar_view_week),
+                  _buildSectionHeader(
+                      'Weekday Weights', Icons.calendar_view_week),
                   Card(
                     child: Padding(
                       padding: const EdgeInsets.all(16),
@@ -249,8 +250,8 @@ class _BehaviorConfigScreenState extends ConsumerState<BehaviorConfigScreen> {
                                       min: 0,
                                       max: 5,
                                       divisions: 5,
-                                      onChanged: (v) =>
-                                          setState(() => _minPerDay = v.round()),
+                                      onChanged: (v) => setState(
+                                          () => _minPerDay = v.round()),
                                     ),
                                   ],
                                 ),
@@ -266,8 +267,8 @@ class _BehaviorConfigScreenState extends ConsumerState<BehaviorConfigScreen> {
                                       min: 5,
                                       max: 20,
                                       divisions: 15,
-                                      onChanged: (v) =>
-                                          setState(() => _maxPerDay = v.round()),
+                                      onChanged: (v) => setState(
+                                          () => _maxPerDay = v.round()),
                                     ),
                                   ],
                                 ),
@@ -281,7 +282,8 @@ class _BehaviorConfigScreenState extends ConsumerState<BehaviorConfigScreen> {
                             min: 0,
                             max: 3,
                             divisions: 3,
-                            onChanged: (v) => setState(() => _jitter = v.round()),
+                            onChanged: (v) =>
+                                setState(() => _jitter = v.round()),
                           ),
                         ],
                       ),
@@ -301,7 +303,8 @@ class _BehaviorConfigScreenState extends ConsumerState<BehaviorConfigScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Growth slope'),
-                              Text('${(_trendSlope * 100).toStringAsFixed(0)}%'),
+                              Text(
+                                  '${(_trendSlope * 100).toStringAsFixed(0)}%'),
                             ],
                           ),
                           Slider(

@@ -255,7 +255,8 @@ class IntraDayConfig {
             .map((w) => TimeWindow.fromJson(w as Map<String, dynamic>))
             .toList(),
         hasLunchGap: json['hasLunchGap'] as bool? ?? true,
-        lateNightProbability: (json['lateNightProbability'] as num?)?.toDouble() ?? 0.03,
+        lateNightProbability:
+            (json['lateNightProbability'] as num?)?.toDouble() ?? 0.03,
       );
 }
 
@@ -268,7 +269,8 @@ class BehaviorConfig {
   final double averageIntensity; // Mean commits per day
   final Map<int, double> weekdayWeights; // 1=Mon..7=Sun, default 1.0
   final List<double> monthlyTrend; // 12 values, multipliers per month
-  final double trendSlope; // Gradual increase over time (0.0 = flat, 0.1 = 10% increase)
+  final double
+      trendSlope; // Gradual increase over time (0.0 = flat, 0.1 = 10% increase)
   final SamplingMode samplingMode;
   final int minPerDay;
   final int maxPerDay;
@@ -324,7 +326,8 @@ class BehaviorConfig {
   Map<String, dynamic> toJson() => {
         'dateRange': dateRange.toJson(),
         'averageIntensity': averageIntensity,
-        'weekdayWeights': weekdayWeights.map((k, v) => MapEntry(k.toString(), v)),
+        'weekdayWeights':
+            weekdayWeights.map((k, v) => MapEntry(k.toString(), v)),
         'monthlyTrend': monthlyTrend,
         'trendSlope': trendSlope,
         'samplingMode': samplingMode.name,
@@ -337,28 +340,43 @@ class BehaviorConfig {
       };
 
   factory BehaviorConfig.fromJson(Map<String, dynamic> json) => BehaviorConfig(
-        dateRange: DateRange.fromJson(json['dateRange'] as Map<String, dynamic>),
+        dateRange:
+            DateRange.fromJson(json['dateRange'] as Map<String, dynamic>),
         averageIntensity: (json['averageIntensity'] as num).toDouble(),
         weekdayWeights: (json['weekdayWeights'] as Map<String, dynamic>)
             .map((k, v) => MapEntry(int.parse(k), (v as num).toDouble())),
-        monthlyTrend:
-            (json['monthlyTrend'] as List).map((e) => (e as num).toDouble()).toList(),
+        monthlyTrend: (json['monthlyTrend'] as List)
+            .map((e) => (e as num).toDouble())
+            .toList(),
         trendSlope: (json['trendSlope'] as num?)?.toDouble() ?? 0.05,
-        samplingMode: SamplingMode.values.byName(json['samplingMode'] as String),
+        samplingMode:
+            SamplingMode.values.byName(json['samplingMode'] as String),
         minPerDay: json['minPerDay'] as int,
         maxPerDay: json['maxPerDay'] as int,
         jitter: json['jitter'] as int? ?? 1,
-        holidays: (json['holidays'] as List).map((e) => DateTime.parse(e as String)).toList(),
-        holidayRegion: HolidayRegion.values.byName(json['holidayRegion'] as String? ?? 'vietnam'),
+        holidays: (json['holidays'] as List)
+            .map((e) => DateTime.parse(e as String))
+            .toList(),
+        holidayRegion: HolidayRegion.values
+            .byName(json['holidayRegion'] as String? ?? 'vietnam'),
         intraDayConfig: json['intraDayConfig'] != null
-            ? IntraDayConfig.fromJson(json['intraDayConfig'] as Map<String, dynamic>)
+            ? IntraDayConfig.fromJson(
+                json['intraDayConfig'] as Map<String, dynamic>)
             : IntraDayConfig.defaultConfig,
       );
 
   static BehaviorConfig defaultConfig(DateRange range) => BehaviorConfig(
         dateRange: range,
         averageIntensity: 3.0,
-        weekdayWeights: {1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 0.9, 6: 0.3, 7: 0.2},
+        weekdayWeights: {
+          1: 1.0,
+          2: 1.0,
+          3: 1.0,
+          4: 1.0,
+          5: 0.9,
+          6: 0.3,
+          7: 0.2
+        },
         monthlyTrend: List.filled(12, 1.0),
         samplingMode: SamplingMode.poisson,
         minPerDay: 0,
@@ -419,8 +437,9 @@ class PlannedDay {
 
   factory PlannedDay.fromJson(Map<String, dynamic> json) => PlannedDay(
         day: DateTime.parse(json['day'] as String),
-        commits:
-            (json['commits'] as List).map((c) => PlannedCommit.fromJson(c as Map<String, dynamic>)).toList(),
+        commits: (json['commits'] as List)
+            .map((c) => PlannedCommit.fromJson(c as Map<String, dynamic>))
+            .toList(),
         isHoliday: json['isHoliday'] as bool? ?? false,
         isWeekend: json['isWeekend'] as bool? ?? false,
       );
@@ -441,7 +460,8 @@ class PlanSummary {
   int get activeDays => days.where((d) => d.count > 0).length;
 
   double get weekendRatio {
-    final weekendCommits = days.where((d) => d.isWeekend).map((d) => d.count).sum;
+    final weekendCommits =
+        days.where((d) => d.isWeekend).map((d) => d.count).sum;
     return totalCommits > 0 ? weekendCommits / totalCommits : 0;
   }
 
@@ -457,8 +477,8 @@ class PlanSummary {
     return squaredDiffs.average;
   }
 
-  List<PlannedCommit> get allCommits =>
-      days.expand((d) => d.commits).toList()..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+  List<PlannedCommit> get allCommits => days.expand((d) => d.commits).toList()
+    ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
   Map<String, dynamic> toJson() => {
         'days': days.map((d) => d.toJson()).toList(),
@@ -466,8 +486,9 @@ class PlanSummary {
       };
 
   factory PlanSummary.fromJson(Map<String, dynamic> json) => PlanSummary(
-        days:
-            (json['days'] as List).map((d) => PlannedDay.fromJson(d as Map<String, dynamic>)).toList(),
+        days: (json['days'] as List)
+            .map((d) => PlannedDay.fromJson(d as Map<String, dynamic>))
+            .toList(),
         config: BehaviorConfig.fromJson(json['config'] as Map<String, dynamic>),
       );
 
@@ -582,7 +603,8 @@ class ContributionDay {
         'count': count,
       };
 
-  factory ContributionDay.fromJson(Map<String, dynamic> json) => ContributionDay(
+  factory ContributionDay.fromJson(Map<String, dynamic> json) =>
+      ContributionDay(
         date: DateTime.parse(json['date'] as String),
         count: json['count'] as int,
       );
@@ -623,7 +645,8 @@ class ContributionProfile {
         'fetchedAt': fetchedAt.toIso8601String(),
       };
 
-  factory ContributionProfile.fromJson(Map<String, dynamic> json) => ContributionProfile(
+  factory ContributionProfile.fromJson(Map<String, dynamic> json) =>
+      ContributionProfile(
         username: json['username'] as String,
         contributions: (json['contributions'] as List)
             .map((c) => ContributionDay.fromJson(c as Map<String, dynamic>))

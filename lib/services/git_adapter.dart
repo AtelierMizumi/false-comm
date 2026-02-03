@@ -64,7 +64,8 @@ class GitAdapter {
 
     // Check if dirty
     final statusResult = await _run(['status', '--porcelain']);
-    final isDirty = statusResult.success && statusResult.output.trim().isNotEmpty;
+    final isDirty =
+        statusResult.success && statusResult.output.trim().isNotEmpty;
 
     // Get remote URL
     final remoteResult = await _run(['config', '--get', 'remote.origin.url']);

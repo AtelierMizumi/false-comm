@@ -180,8 +180,12 @@ class _AppShellState extends ConsumerState<AppShell> {
 
     Color getColor() {
       if (isActive) return theme.colorScheme.primary;
-      if (isCompleted) return Color.alphaBlend(theme.colorScheme.primary.withAlpha(180), Colors.white);
-      if (!isEnabled) return Color.alphaBlend(theme.colorScheme.outline.withAlpha(128), Colors.white);
+      if (isCompleted)
+        return Color.alphaBlend(
+            theme.colorScheme.primary.withAlpha(180), Colors.white);
+      if (!isEnabled)
+        return Color.alphaBlend(
+            theme.colorScheme.outline.withAlpha(128), Colors.white);
       return theme.colorScheme.onSurfaceVariant;
     }
 
@@ -194,7 +198,9 @@ class _AppShellState extends ConsumerState<AppShell> {
           color: isActive
               ? theme.colorScheme.primaryContainer
               : isCompleted
-                  ? Color.alphaBlend(theme.colorScheme.primaryContainer.withAlpha(128), Colors.white)
+                  ? Color.alphaBlend(
+                      theme.colorScheme.primaryContainer.withAlpha(128),
+                      Colors.white)
                   : Colors.transparent,
           border: Border.all(
             color: getColor(),

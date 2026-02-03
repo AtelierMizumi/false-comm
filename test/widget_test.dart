@@ -41,7 +41,8 @@ void main() {
     expect(find.text('Run History'), findsOneWidget);
   });
 
-  testWidgets('Repo picker screen shows initially', (WidgetTester tester) async {
+  testWidgets('Repo picker screen shows initially',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       const ProviderScope(
         child: FakeCommApp(),
@@ -57,7 +58,8 @@ void main() {
     expect(find.text('Validate'), findsOneWidget);
   });
 
-  testWidgets('Next button is disabled without valid repo', (WidgetTester tester) async {
+  testWidgets('Next button is disabled without valid repo',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       const ProviderScope(
         child: FakeCommApp(),

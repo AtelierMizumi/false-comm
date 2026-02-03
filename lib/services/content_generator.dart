@@ -164,7 +164,8 @@ class ContentGeneratorService implements ContentGenerator {
   }
 
   /// Generate or update progress.json
-  Future<String> _generateProgressUpdate(DateTime timestamp, String repoPath) async {
+  Future<String> _generateProgressUpdate(
+      DateTime timestamp, String repoPath) async {
     final filePath = '$repoPath/progress.json';
     final file = File(filePath);
 

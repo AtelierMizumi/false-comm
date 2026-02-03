@@ -7,7 +7,8 @@ import '../domain/models.dart';
 class GitHubHistoryService {
   final http.Client _client;
 
-  GitHubHistoryService({http.Client? client}) : _client = client ?? http.Client();
+  GitHubHistoryService({http.Client? client})
+      : _client = client ?? http.Client();
 
   /// Fetch contribution profile using the best available method
   Future<ContributionProfile?> fetchProfile(

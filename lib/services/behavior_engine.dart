@@ -16,7 +16,8 @@ class BehaviorEngine {
 
     for (var i = 0; i < allDays.length; i++) {
       final day = allDays[i];
-      final isWeekend = day.weekday == DateTime.saturday || day.weekday == DateTime.sunday;
+      final isWeekend =
+          day.weekday == DateTime.saturday || day.weekday == DateTime.sunday;
       final isHoliday = _isHoliday(day, config.holidays);
 
       // Calculate commit count for this day
@@ -93,7 +94,8 @@ class BehaviorEngine {
 
     // Apply jitter
     if (config.jitter > 0) {
-      final jitterValue = _random.nextInt(config.jitter * 2 + 1) - config.jitter;
+      final jitterValue =
+          _random.nextInt(config.jitter * 2 + 1) - config.jitter;
       count += jitterValue;
     }
 
@@ -135,18 +137,21 @@ class BehaviorEngine {
   DateTime _generateCommitTime(DateTime day, IntraDayConfig config) {
     // Check for late-night commit
     if (_random.nextDouble() < config.lateNightProbability) {
-      return IntraDayConfig.lateNightWindow.randomTimeOn(day, _random.nextDouble());
+      return IntraDayConfig.lateNightWindow
+          .randomTimeOn(day, _random.nextDouble());
     }
 
     // Select a work window weighted by duration
     final windows = config.workWindows;
     if (windows.isEmpty) {
       // Fallback: random time between 9am and 6pm
-      return DateTime(day.year, day.month, day.day, 9 + _random.nextInt(9), _random.nextInt(60));
+      return DateTime(day.year, day.month, day.day, 9 + _random.nextInt(9),
+          _random.nextInt(60));
     }
 
     // Weight by window duration
-    final totalDuration = windows.fold<int>(0, (sum, w) => sum + w.durationMinutes);
+    final totalDuration =
+        windows.fold<int>(0, (sum, w) => sum + w.durationMinutes);
     var randomMinutes = _random.nextInt(totalDuration);
 
     for (final window in windows) {
@@ -171,8 +176,8 @@ class BehaviorEngine {
 
   /// Check if a day is a holiday
   bool _isHoliday(DateTime day, List<DateTime> holidays) {
-    return holidays.any((h) =>
-        h.year == day.year && h.month == day.month && h.day == day.day);
+    return holidays.any(
+        (h) => h.year == day.year && h.month == day.month && h.day == day.day);
   }
 
   /// Sample from Poisson distribution
@@ -224,7 +229,8 @@ class BehaviorEngine {
     for (var day = 1; day <= 7; day++) {
       final configVal = config.weekdayWeights[day] ?? 1.0;
       final profileVal = profileWeights[day] ?? 1.0;
-      blendedWeights[day] = (configVal * configWeight) + (profileVal * userWeight);
+      blendedWeights[day] =
+          (configVal * configWeight) + (profileVal * userWeight);
     }
 
     return config.copyWith(

@@ -106,7 +106,8 @@ class _PreviewScreenState extends ConsumerState<PreviewScreen> {
                       ),
                     ],
                     selected: {_showTable},
-                    onSelectionChanged: (v) => setState(() => _showTable = v.first),
+                    onSelectionChanged: (v) =>
+                        setState(() => _showTable = v.first),
                   ),
                 ],
               ),
@@ -378,14 +379,13 @@ class ContributionHeatmap extends StatelessWidget {
         Row(
           children: [
             const SizedBox(width: 40), // Space for month labels
-            ...['Mon', '', 'Wed', '', 'Fri', '', 'Sun']
-                .map((d) => SizedBox(
-                      width: 14,
-                      child: Text(
-                        d,
-                        style: const TextStyle(fontSize: 9),
-                      ),
-                    )),
+            ...['Mon', '', 'Wed', '', 'Fri', '', 'Sun'].map((d) => SizedBox(
+                  width: 14,
+                  child: Text(
+                    d,
+                    style: const TextStyle(fontSize: 9),
+                  ),
+                )),
           ],
         ),
         const SizedBox(height: 4),

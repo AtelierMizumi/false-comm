@@ -6,7 +6,7 @@ void main() {
   group('GitAdapter Static Tests', () {
     test('getGitVersion returns version string', () async {
       final version = await GitAdapter.getGitVersion();
-      
+
       // Git should be installed
       expect(version, isNotNull);
       expect(version!.contains('git version'), true);
@@ -24,16 +24,16 @@ void main() {
 
       // Initialize git repo
       await Process.run('git', ['init'], workingDirectory: tempDir.path);
-      await Process.run('git', ['config', 'user.email', 'test@test.com'], 
+      await Process.run('git', ['config', 'user.email', 'test@test.com'],
           workingDirectory: tempDir.path);
-      await Process.run('git', ['config', 'user.name', 'Test User'], 
+      await Process.run('git', ['config', 'user.name', 'Test User'],
           workingDirectory: tempDir.path);
-      
+
       // Create initial commit
       final testFile = File('${tempDir.path}/README.md');
       await testFile.writeAsString('# Test Repo\n');
       await Process.run('git', ['add', '.'], workingDirectory: tempDir.path);
-      await Process.run('git', ['commit', '-m', 'Initial commit'], 
+      await Process.run('git', ['commit', '-m', 'Initial commit'],
           workingDirectory: tempDir.path);
     });
 
@@ -137,7 +137,7 @@ void main() {
 
     test('getCommitCount returns correct count', () async {
       final count = await git.getCommitCount();
-      
+
       // We created 1 initial commit in setUp
       expect(count >= 1, true);
     });

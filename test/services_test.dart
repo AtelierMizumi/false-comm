@@ -34,7 +34,7 @@ void main() {
     test('Vietnam holidays include Tet', () {
       final range = DateRange(DateTime(2024, 1, 1), DateTime(2024, 12, 31));
       final holidays = holidayService.getHolidays(HolidayRegion.vietnam, range);
-      
+
       expect(holidays.isNotEmpty, true);
       // Should include New Year
       expect(holidays.any((h) => h.month == 1 && h.day == 1), true);
@@ -47,7 +47,7 @@ void main() {
     test('USA holidays include July 4th', () {
       final range = DateRange(DateTime(2024, 1, 1), DateTime(2024, 12, 31));
       final holidays = holidayService.getHolidays(HolidayRegion.usa, range);
-      
+
       expect(holidays.any((h) => h.month == 7 && h.day == 4), true);
       expect(holidays.any((h) => h.month == 12 && h.day == 25), true);
     });
@@ -55,7 +55,7 @@ void main() {
     test('Japan holidays include New Year period', () {
       final range = DateRange(DateTime(2024, 1, 1), DateTime(2024, 12, 31));
       final holidays = holidayService.getHolidays(HolidayRegion.japan, range);
-      
+
       expect(holidays.any((h) => h.month == 1 && h.day == 1), true);
       expect(holidays.any((h) => h.month == 1 && h.day == 2), true);
       expect(holidays.any((h) => h.month == 1 && h.day == 3), true);
@@ -81,12 +81,20 @@ void main() {
 
   group('BehaviorEngine Tests', () {
     final engine = BehaviorEngine();
-    
+
     test('generates plan with correct number of days', () {
       final config = BehaviorConfig(
         dateRange: DateRange(DateTime(2024, 1, 1), DateTime(2024, 1, 10)),
         averageIntensity: 3.0,
-        weekdayWeights: {1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0.3, 7: 0.2},
+        weekdayWeights: {
+          1: 1.0,
+          2: 1.0,
+          3: 1.0,
+          4: 1.0,
+          5: 1.0,
+          6: 0.3,
+          7: 0.2
+        },
         monthlyTrend: List.filled(12, 1.0),
         samplingMode: SamplingMode.poisson,
         minPerDay: 0,
@@ -106,7 +114,15 @@ void main() {
       final config = BehaviorConfig(
         dateRange: DateRange(DateTime(2024, 1, 1), DateTime(2024, 1, 10)),
         averageIntensity: 5.0,
-        weekdayWeights: {1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0},
+        weekdayWeights: {
+          1: 1.0,
+          2: 1.0,
+          3: 1.0,
+          4: 1.0,
+          5: 1.0,
+          6: 1.0,
+          7: 1.0
+        },
         monthlyTrend: List.filled(12, 1.0),
         samplingMode: SamplingMode.poisson,
         minPerDay: 0,
@@ -119,9 +135,10 @@ void main() {
 
       // Find the holiday day
       final holidayPlan = plan.days.firstWhere(
-        (d) => d.day.year == holiday.year && 
-               d.day.month == holiday.month && 
-               d.day.day == holiday.day,
+        (d) =>
+            d.day.year == holiday.year &&
+            d.day.month == holiday.month &&
+            d.day.day == holiday.day,
       );
 
       expect(holidayPlan.isHoliday, true);
@@ -134,7 +151,15 @@ void main() {
       final config = BehaviorConfig(
         dateRange: DateRange(DateTime(2024, 1, 6), DateTime(2024, 1, 7)),
         averageIntensity: 3.0,
-        weekdayWeights: {1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0.3, 7: 0.2},
+        weekdayWeights: {
+          1: 1.0,
+          2: 1.0,
+          3: 1.0,
+          4: 1.0,
+          5: 1.0,
+          6: 0.3,
+          7: 0.2
+        },
         monthlyTrend: List.filled(12, 1.0),
         samplingMode: SamplingMode.poisson,
         minPerDay: 0,
@@ -152,7 +177,15 @@ void main() {
       final config = BehaviorConfig(
         dateRange: DateRange(DateTime(2024, 1, 1), DateTime(2024, 1, 30)),
         averageIntensity: 10.0, // High intensity
-        weekdayWeights: {1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0},
+        weekdayWeights: {
+          1: 1.0,
+          2: 1.0,
+          3: 1.0,
+          4: 1.0,
+          5: 1.0,
+          6: 1.0,
+          7: 1.0
+        },
         monthlyTrend: List.filled(12, 1.0),
         samplingMode: SamplingMode.poisson,
         minPerDay: 2,
@@ -172,7 +205,15 @@ void main() {
       final config = BehaviorConfig(
         dateRange: DateRange(DateTime(2024, 1, 1), DateTime(2024, 1, 10)),
         averageIntensity: 2.0,
-        weekdayWeights: {1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 0.5, 7: 0.5},
+        weekdayWeights: {
+          1: 1.0,
+          2: 1.0,
+          3: 1.0,
+          4: 1.0,
+          5: 1.0,
+          6: 0.5,
+          7: 0.5
+        },
         monthlyTrend: List.filled(12, 1.0),
         samplingMode: SamplingMode.poisson,
         minPerDay: 0,
@@ -191,7 +232,8 @@ void main() {
         fetchedAt: DateTime.now(),
       );
 
-      final blended = engine.blendWithProfile(config, profile, profileWeight: 0.5);
+      final blended =
+          engine.blendWithProfile(config, profile, profileWeight: 0.5);
 
       // Blended intensity should be between config (2.0) and profile average
       expect(blended.averageIntensity > 2.0, true);
@@ -416,7 +458,7 @@ void main() {
       );
 
       final weights = profile.weekdayWeights;
-      
+
       // Monday should have weight 1.0 (highest)
       expect(weights[1], 1.0);
       // Saturday should have weight 0.2 (2/10)

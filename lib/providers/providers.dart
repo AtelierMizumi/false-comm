@@ -106,7 +106,8 @@ class AppStateNotifier extends StateNotifier<AppState> {
 }
 
 /// App state provider
-final appStateProvider = StateNotifierProvider<AppStateNotifier, AppState>((ref) {
+final appStateProvider =
+    StateNotifierProvider<AppStateNotifier, AppState>((ref) {
   return AppStateNotifier(ref);
 });
 
@@ -159,7 +160,8 @@ final contributionProfileProvider = Provider<ContributionProfile?>((ref) {
 // ============================================================================
 
 /// Validate repository
-final validateRepoProvider = FutureProvider.family<RepoConfig, String>((ref, path) async {
+final validateRepoProvider =
+    FutureProvider.family<RepoConfig, String>((ref, path) async {
   final git = GitAdapter(path);
   return git.validateRepo();
 });
@@ -184,8 +186,8 @@ final generatePlanProvider = Provider<PlanSummary? Function()>((ref) {
 });
 
 /// Fetch GitHub contributions
-final fetchContributionsProvider =
-    FutureProvider.family<ContributionProfile?, ({String username, String? pat})>(
+final fetchContributionsProvider = FutureProvider.family<ContributionProfile?,
+    ({String username, String? pat})>(
   (ref, params) async {
     final service = ref.read(githubHistoryServiceProvider);
     return service.fetchProfile(params.username, pat: params.pat);
@@ -248,8 +250,7 @@ class ExecutionState {
     );
   }
 
-  double get progress =>
-      totalCommits > 0 ? currentCommit / totalCommits : 0;
+  double get progress => totalCommits > 0 ? currentCommit / totalCommits : 0;
 }
 
 class ExecutionNotifier extends StateNotifier<ExecutionState> {
@@ -353,7 +354,8 @@ class ExecutionNotifier extends StateNotifier<ExecutionState> {
   }
 }
 
-final executionProvider = StateNotifierProvider<ExecutionNotifier, ExecutionState>((ref) {
+final executionProvider =
+    StateNotifierProvider<ExecutionNotifier, ExecutionState>((ref) {
   return ExecutionNotifier(ref);
 });
 
@@ -415,7 +417,8 @@ class UndoNotifier extends StateNotifier<UndoState> {
     }
   }
 
-  Future<void> performUndo(RunSnapshot snapshot, {bool forcePush = false}) async {
+  Future<void> performUndo(RunSnapshot snapshot,
+      {bool forcePush = false}) async {
     state = state.copyWith(isProcessing: true);
 
     try {

@@ -96,7 +96,8 @@ class _IdentityScreenState extends ConsumerState<IdentityScreen> {
           _isFetching = false;
           _fetchedProfile = profile;
           if (profile == null) {
-            _fetchError = 'Could not fetch contribution data. Check username or try adding a PAT.';
+            _fetchError =
+                'Could not fetch contribution data. Check username or try adding a PAT.';
           }
         });
 
@@ -222,7 +223,8 @@ class _IdentityScreenState extends ConsumerState<IdentityScreen> {
                               Expanded(
                                 child: SwitchListTile(
                                   contentPadding: EdgeInsets.zero,
-                                  title: const Text('Import GitHub Contribution Pattern'),
+                                  title: const Text(
+                                      'Import GitHub Contribution Pattern'),
                                   subtitle: const Text(
                                     'Mirror your actual contribution style for more natural-looking commits',
                                   ),
@@ -234,17 +236,18 @@ class _IdentityScreenState extends ConsumerState<IdentityScreen> {
                               ),
                             ],
                           ),
-
                           if (_fetchContributions) ...[
                             const SizedBox(height: 16),
                             TextField(
                               controller: _patController,
                               decoration: const InputDecoration(
-                                labelText: 'GitHub Personal Access Token (optional)',
+                                labelText:
+                                    'GitHub Personal Access Token (optional)',
                                 hintText: 'ghp_xxxx... (read:user scope)',
                                 border: OutlineInputBorder(),
                                 prefixIcon: Icon(Icons.key),
-                                helperText: 'Leave empty to use HTML scraping (less accurate)',
+                                helperText:
+                                    'Leave empty to use HTML scraping (less accurate)',
                               ),
                               obscureText: true,
                             ),
@@ -252,23 +255,30 @@ class _IdentityScreenState extends ConsumerState<IdentityScreen> {
                             Row(
                               children: [
                                 ElevatedButton.icon(
-                                  onPressed: _isFetching ? null : _fetchContributionProfile,
+                                  onPressed: _isFetching
+                                      ? null
+                                      : _fetchContributionProfile,
                                   icon: _isFetching
                                       ? const SizedBox(
                                           width: 18,
                                           height: 18,
-                                          child: CircularProgressIndicator(strokeWidth: 2),
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2),
                                         )
                                       : const Icon(Icons.download),
-                                  label: Text(_isFetching ? 'Fetching...' : 'Fetch Profile'),
+                                  label: Text(_isFetching
+                                      ? 'Fetching...'
+                                      : 'Fetch Profile'),
                                 ),
                                 if (_fetchedProfile != null) ...[
                                   const SizedBox(width: 12),
-                                  Icon(Icons.check_circle, color: theme.colorScheme.primary),
+                                  Icon(Icons.check_circle,
+                                      color: theme.colorScheme.primary),
                                   const SizedBox(width: 4),
                                   Text(
                                     '${_fetchedProfile!.contributions.length} days loaded',
-                                    style: TextStyle(color: theme.colorScheme.primary),
+                                    style: TextStyle(
+                                        color: theme.colorScheme.primary),
                                   ),
                                 ],
                               ],
@@ -278,7 +288,8 @@ class _IdentityScreenState extends ConsumerState<IdentityScreen> {
                                 padding: const EdgeInsets.only(top: 8),
                                 child: Text(
                                   _fetchError!,
-                                  style: TextStyle(color: theme.colorScheme.error),
+                                  style:
+                                      TextStyle(color: theme.colorScheme.error),
                                 ),
                               ),
                             if (_fetchedProfile != null)

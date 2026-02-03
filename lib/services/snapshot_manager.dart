@@ -80,13 +80,15 @@ class SnapshotManager {
   /// Update the history index file
   Future<void> _updateHistoryIndex() async {
     final snapshots = await loadAllSnapshots();
-    final index = snapshots.map((s) => {
-      'id': s.id,
-      'createdAt': s.createdAt.toIso8601String(),
-      'totalCommits': s.totalCommits,
-      'status': s.status.name,
-      'pushed': s.pushed,
-    }).toList();
+    final index = snapshots
+        .map((s) => {
+              'id': s.id,
+              'createdAt': s.createdAt.toIso8601String(),
+              'totalCommits': s.totalCommits,
+              'status': s.status.name,
+              'pushed': s.pushed,
+            })
+        .toList();
 
     final file = File(_historyPath);
     const encoder = JsonEncoder.withIndent('  ');
@@ -206,10 +208,12 @@ class UndoService {
         final pushResult = await git.forcePushWithLease();
         if (!pushResult.success) {
           errors.add('Force push failed: ${pushResult.error}');
-          errors.add('Remote still has the commits. Manual cleanup may be needed.');
+          errors.add(
+              'Remote still has the commits. Manual cleanup may be needed.');
         }
       } else if (snapshot.pushed) {
-        errors.add('Commits were pushed to remote. Use force push to remove them.');
+        errors.add(
+            'Commits were pushed to remote. Use force push to remove them.');
       }
 
       onProgress?.call('Undo complete');
@@ -243,7 +247,8 @@ class UndoService {
     if (repoConfig.branch != snapshot.branch) {
       return UndoSafetyCheck(
         isSafe: false,
-        reason: 'Currently on branch "${repoConfig.branch}" but run was on "${snapshot.branch}"',
+        reason:
+            'Currently on branch "${repoConfig.branch}" but run was on "${snapshot.branch}"',
       );
     }
 
@@ -259,7 +264,8 @@ class UndoService {
     if (commitsBetween.length > expectedCommits) {
       return UndoSafetyCheck(
         isSafe: false,
-        reason: 'There are ${commitsBetween.length - expectedCommits} new commits after the run',
+        reason:
+            'There are ${commitsBetween.length - expectedCommits} new commits after the run',
         additionalCommits: commitsBetween.length - expectedCommits,
       );
     }
