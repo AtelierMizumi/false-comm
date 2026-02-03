@@ -1,0 +1,25 @@
+name: fake_comm_gui
+description: Cross-platform GUI for natural-looking commit scheduling
+version: 0.1.0
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.5.0
+  http: ^1.2.0
+  intl: ^0.19.0
+  yaml: ^3.1.2
+  timezone: ^0.9.2
+  path: ^1.9.0
+  collection: ^1.18.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
