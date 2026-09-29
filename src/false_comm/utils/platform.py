@@ -78,12 +78,8 @@ def detect_linux_timezone() -> str:
     """Detect timezone in Git offset format (+0700, -0500) respecting Linux configs and TZ."""
     # 1. Check TZ environment variable if set
     tz_env = os.environ.get("TZ")
-    if tz_env:
-        try:
-            # Let standard time module parse TZ
-            time.tzset()
-        except AttributeError:
-            pass
+    if tz_env and hasattr(time, "tzset"):
+        getattr(time, "tzset")()
 
     # 2. Check /etc/localtime symlink target on Linux
     localtime = Path("/etc/localtime")
