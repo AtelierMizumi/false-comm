@@ -1,0 +1,62 @@
+# Maintainer: false-comm contributors <thuanc177@gmail.com>
+pkgname=false-comm
+pkgver=2.0.0
+pkgrel=1
+pkgdesc="Realistic, stealth Git commit history synthesizer for developers"
+arch=('any')
+url="https://github.com/AtelierMizumi/false-comm"
+license=('MIT')
+depends=(
+    'python>=3.12'
+    'python-pydantic'
+    'python-yaml'
+    'python-rich'
+    'python-typer'
+    'git'
+)
+makedepends=(
+    'python-build'
+    'python-installer'
+    'python-wheel'
+    'python-hatchling'
+)
+checkdepends=(
+    'python-pytest'
+    'python-hypothesis'
+)
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/AtelierMizumi/${pkgname}/archive/refs/tags/v${pkgver}.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+    cd "${pkgname}-${pkgver}"
+    python -m build --wheel --no-isolation
+}
+
+check() {
+    cd "${pkgname}-${pkgver}"
+    python -m pytest tests/unit
+}
+
+package() {
+    cd "${pkgname}-${pkgver}"
+    python -m installer --destdir="${pkgdir}" dist/*.whl
+
+    # Install license
+    install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+
+    # Install shell completions if present
+    if [ -d "packaging/completions" ]; then
+        install -Dm644 packaging/completions/bash "${pkgdir}/usr/share/bash-completion/completions/false-comm"
+        install -Dm644 packaging/completions/bash "${pkgdir}/usr/share/bash-completion/completions/fc"
+        install -Dm644 packaging/completions/zsh "${pkgdir}/usr/share/zsh/site-functions/_false-comm"
+        install -Dm644 packaging/completions/zsh "${pkgdir}/usr/share/zsh/site-functions/_fc"
+        install -Dm644 packaging/completions/fish "${pkgdir}/usr/share/fish/vendor_completions.d/false-comm.fish"
+        install -Dm644 packaging/completions/fish "${pkgdir}/usr/share/fish/vendor_completions.d/fc.fish"
+    fi
+
+    # Install man page if present
+    if [ -f "packaging/man/false-comm.1" ]; then
+        install -Dm644 packaging/man/false-comm.1 "${pkgdir}/usr/share/man/man1/false-comm.1"
+    fi
+}

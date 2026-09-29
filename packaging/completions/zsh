@@ -1,0 +1,28 @@
+#compdef false-comm fc
+
+_false_comm_zsh() {
+    local -a completions
+    local -a completions_with_descriptions
+    local response
+    (( ! $+commands[false-comm] )) && return 1
+
+    response=("${(@f)$(env COMP_WORDS="${words[*]}" COMP_CWORD=$((CURRENT-1)) _FALSE_COMM_COMPLETE=complete-zsh false-comm 2>/dev/null)}")
+
+    for key descr in ${(kv)response}; do
+        if [[ -n "$descr" ]]; then
+            completions_with_descriptions+=("${key}:${descr}")
+        else
+            completions+=("${key}")
+        fi
+    done
+
+    if [ -n "$completions_with_descriptions" ]; then
+        _describe -V unsorted completions_with_descriptions -U
+    fi
+
+    if [ -n "$completions" ]; then
+        compadd -U -V unsorted -a completions
+    fi
+}
+
+compdef _false_comm_zsh false-comm fc

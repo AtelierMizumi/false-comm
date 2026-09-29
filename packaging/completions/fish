@@ -1,0 +1,11 @@
+# fish completion for false-comm / fc
+
+function __complete_false_comm
+    set -lx COMP_WORDS (commandline -o)
+    set -lx COMP_CWORD (math (count $COMP_WORDS) - 1)
+    set -lx _FALSE_COMM_COMPLETE complete-fish
+    false-comm 2>/dev/null
+end
+
+complete -c false-comm -f -a '(__complete_false_comm)'
+complete -c fc -f -a '(__complete_false_comm)'

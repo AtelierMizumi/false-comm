@@ -1,0 +1,54 @@
+.TH FALSE-COMM 1 "September 2026" "false-comm 2.0.0" "User Commands"
+.SH NAME
+false-comm, fc \- realistic, stealth Git commit history synthesizer for developers
+.SH SYNOPSIS
+.B false-comm
+[\fIOPTIONS\fR] \fICOMMAND\fR [\fIARGS\fR]...
+.br
+.B fc
+[\fIOPTIONS\fR] \fICOMMAND\fR [\fIARGS\fR]...
+.SH DESCRIPTION
+.B false-comm
+synthesizes organic, statistically natural Git commit histories using Negative Binomial distributions, realistic intra-day working hours with jitter, multi-country holiday calendars, and meaningful semantic file diffs.
+.PP
+It also features a \fBReplay Mode\fR to deconstruct monolithic commits into atomic progressive steps across business hours.
+.SH OPTIONS
+.TP
+\fB\-v\fR, \fB\-\-version\fR
+Show version and exit.
+.TP
+\fB\-l\fR, \fB\-\-lang\fR \fILOCALE\fR
+Specify interface language (\fBen\fR for English, \fBvi\fR for Vietnamese).
+.TP
+\fB\-\-help\fR
+Show help message and exit.
+.SH COMMANDS
+.TP
+\fBdoctor\fR [\fI\-\-repo PATH\fR]
+Run comprehensive environment diagnostics inspecting Git CLI, author identity, working tree cleanliness, and snapshot storage.
+.TP
+\fBpreview\fR \fB\-\-from\fR \fIDATE\fR \fB\-\-to\fR \fIDATE\fR [\fI\-\-profile PROFILE\fR]
+Render a terminal contribution heatmap grid and statistical metrics without committing.
+.TP
+\fBbackfill\fR \fB\-\-from\fR \fIDATE\fR \fB\-\-to\fR \fIDATE\fR [\fIOPTIONS\fR]
+Synthesize historical commits over a specified date range.
+.TP
+\fBreplay\fR \fICOMMIT_REF\fR [\fI\-\-span SPAN\fR] [\fI\-\-profile PROFILE\fR]
+Deconstruct a monolithic commit into realistic progressive atomic commits over business days.
+.TP
+\fBundo\fR [\fI\-\-snapshot ID\fR] [\fI\-\-list\fR]
+Restore repository state to a previous pre-execution safety checkpoint.
+.TP
+\fBprofiles\fR
+List available behavioral profiles and their parameters (standard, grinder, opensource, student).
+.SH ENVIRONMENT
+.TP
+.B FALSE_COMM_LANG
+Overrides interface language (\fBen\fR, \fBvi\fR).
+.TP
+.B TZ
+Overrides local timezone calculation for commit author/committer dates.
+.SH AUTHORS
+Developed by false-comm contributors.
+.SH LICENSE
+MIT License.

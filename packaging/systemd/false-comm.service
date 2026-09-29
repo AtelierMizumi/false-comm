@@ -1,0 +1,13 @@
+[Unit]
+Description=false-comm automated developer commit maintenance
+Documentation=https://github.com/AtelierMizumi/false-comm
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/fc backfill --from yesterday --to today --profile standard --yes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,38 @@
+name: "standard"
+description: "Typical professional software engineer (9-5 core, high weekday consistency, resting weekends)"
+dispersion_r: 2.5
+prob_p: 0.45
+weekday_active_prob: 0.88
+weekend_active_prob: 0.12
+weekday_weights: [1.0, 1.2, 1.25, 1.1, 0.85, 0.20, 0.15]
+time_windows:
+  - name: "morning"
+    start_hour: 9
+    end_hour: 12
+    probability: 0.35
+    peak_hour: 10
+  - name: "afternoon"
+    start_hour: 13
+    end_hour: 18
+    probability: 0.55
+    peak_hour: 15
+  - name: "evening"
+    start_hour: 19
+    end_hour: 22
+    probability: 0.10
+    peak_hour: 20
+lunch_dip_start: 12
+lunch_dip_end: 13
+lunch_suppression_factor: 0.10
+burst_probability: 0.30
+burst_min_commits: 2
+burst_max_commits: 4
+burst_gap_minutes_min: 5
+burst_gap_minutes_max: 30
+vacation_weeks_per_year: 3
+holiday_region: "GLOBAL"
+message_style: "conventional"
+multiline_message_prob: 0.25
+branch_simulation_enabled: true
+branch_ratio: 0.25
+merge_commit_enabled: true

@@ -1,0 +1,33 @@
+name: "student"
+description: "CS student / bootcamp learner (irregular sprints, weekend homework, late night deadline crunches)"
+dispersion_r: 2.0
+prob_p: 0.52
+weekday_active_prob: 0.70
+weekend_active_prob: 0.75
+weekday_weights: [0.9, 0.9, 1.1, 1.2, 0.8, 1.3, 1.4]
+time_windows:
+  - name: "afternoon"
+    start_hour: 14
+    end_hour: 18
+    probability: 0.35
+    peak_hour: 16
+  - name: "night_crunch"
+    start_hour: 20
+    end_hour: 23
+    probability: 0.65
+    peak_hour: 22
+lunch_dip_start: 12
+lunch_dip_end: 13
+lunch_suppression_factor: 0.50
+burst_probability: 0.50
+burst_min_commits: 2
+burst_max_commits: 5
+burst_gap_minutes_min: 3
+burst_gap_minutes_max: 20
+vacation_weeks_per_year: 5
+holiday_region: "GLOBAL"
+message_style: "freeform"
+multiline_message_prob: 0.15
+branch_simulation_enabled: false
+branch_ratio: 0.0
+merge_commit_enabled: false

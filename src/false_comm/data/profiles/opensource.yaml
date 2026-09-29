@@ -1,0 +1,38 @@
+name: "opensource"
+description: "Open-source maintainer / side-project contributor (evening & weekend spikes, low daytime weekday)"
+dispersion_r: 2.2
+prob_p: 0.50
+weekday_active_prob: 0.65
+weekend_active_prob: 0.85
+weekday_weights: [0.7, 0.7, 0.8, 0.8, 0.9, 1.4, 1.3]
+time_windows:
+  - name: "lunch_break"
+    start_hour: 12
+    end_hour: 13
+    probability: 0.15
+    peak_hour: 12
+  - name: "evening"
+    start_hour: 18
+    end_hour: 23
+    probability: 0.70
+    peak_hour: 21
+  - name: "weekend_afternoon"
+    start_hour: 13
+    end_hour: 18
+    probability: 0.15
+    peak_hour: 15
+lunch_dip_start: 13
+lunch_dip_end: 14
+lunch_suppression_factor: 0.50
+burst_probability: 0.40
+burst_min_commits: 2
+burst_max_commits: 5
+burst_gap_minutes_min: 5
+burst_gap_minutes_max: 35
+vacation_weeks_per_year: 4
+holiday_region: "GLOBAL"
+message_style: "conventional"
+multiline_message_prob: 0.35
+branch_simulation_enabled: true
+branch_ratio: 0.40
+merge_commit_enabled: true

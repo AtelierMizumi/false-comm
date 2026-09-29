@@ -1,0 +1,24 @@
+# bash completion for false-comm / fc
+
+_false_comm_completion() {
+    local IFS=$'\n'
+    local response
+
+    response=$(env COMP_WORDS="${COMP_WORDS[*]}" COMP_CWORD=$COMP_CWORD _FALSE_COMM_COMPLETE=complete-bash false-comm 2>/dev/null)
+
+    for completion in $response; do
+        IFS=',' read type value description <<< "$completion"
+        if [ "$type" = "dir" ]; then
+            COMPREPLY=()
+            compopt -o dirnames
+        elif [ "$type" = "file" ]; then
+            COMPREPLY=()
+            compopt -o default
+        elif [ "$type" = "plain" ]; then
+            COMPREPLY+=("$value")
+        fi
+    done
+}
+
+complete -o default -F _false_comm_completion false-comm
+complete -o default -F _false_comm_completion fc

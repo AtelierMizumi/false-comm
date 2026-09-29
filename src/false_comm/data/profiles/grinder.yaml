@@ -1,0 +1,38 @@
+name: "grinder"
+description: "Intense startup engineer / prolific builder (frequent bursts, late nights, high weekend activity)"
+dispersion_r: 3.5
+prob_p: 0.38
+weekday_active_prob: 0.95
+weekend_active_prob: 0.60
+weekday_weights: [1.1, 1.3, 1.3, 1.2, 1.1, 0.8, 0.7]
+time_windows:
+  - name: "morning"
+    start_hour: 9
+    end_hour: 12
+    probability: 0.25
+    peak_hour: 11
+  - name: "afternoon"
+    start_hour: 13
+    end_hour: 19
+    probability: 0.45
+    peak_hour: 16
+  - name: "night"
+    start_hour: 20
+    end_hour: 23
+    probability: 0.30
+    peak_hour: 22
+lunch_dip_start: 12
+lunch_dip_end: 13
+lunch_suppression_factor: 0.25
+burst_probability: 0.45
+burst_min_commits: 2
+burst_max_commits: 6
+burst_gap_minutes_min: 3
+burst_gap_minutes_max: 25
+vacation_weeks_per_year: 1
+holiday_region: "GLOBAL"
+message_style: "conventional"
+multiline_message_prob: 0.30
+branch_simulation_enabled: true
+branch_ratio: 0.35
+merge_commit_enabled: true
