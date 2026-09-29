@@ -76,8 +76,6 @@ def resolve_date_range(from_expr: str, to_expr: str | None = None) -> tuple[date
         end_date = to_date
 
     if start_date > end_date:
-        raise ValueError(
-            f"Start date ({start_date}) cannot be after end date ({end_date})."
-        )
+        raise ValueError(f"Start date ({start_date}) cannot be after end date ({end_date}).")
 
     return start_date, end_date

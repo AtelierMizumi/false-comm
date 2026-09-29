@@ -20,9 +20,7 @@ from false_comm.models.config import DateRange, RepositoryRules
 from false_comm.utils.dates import resolve_date_range
 
 
-def render_celebration_card(
-    res: ExecutionResult, plan: CommitPlan, console: Console
-) -> None:
+def render_celebration_card(res: ExecutionResult, plan: CommitPlan, console: Console) -> None:
     """Render a rewarding completion card confirming safety and next actions."""
     content = Text()
     content.append(f"🎉 {t('backfill.success_title')}\n\n", style="bold green")

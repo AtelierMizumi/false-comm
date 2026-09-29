@@ -169,12 +169,14 @@ jobs:
       - name: Generate Checksums
         working-directory: release-assets
         run: |
-          sha256sum * > sha256sums.txt
+          find . -maxdepth 1 -type f -exec sha256sum {} + > sha256sums.txt
           cat sha256sums.txt
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: release-assets/*
           generate_release_notes: true

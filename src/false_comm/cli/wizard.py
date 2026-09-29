@@ -76,13 +76,27 @@ def run_mission_control(repo_path: Path | None = None, console: Console | None =
     menu_table.add_column("Action", style="bold white")
     menu_table.add_column("Description", style="dim")
 
-    menu_table.add_row("[1]", "🚀 Backfill History", "Synthesize realistic commits across a date range")
-    menu_table.add_row("[2]", "🎬 Replay Commit", "Deconstruct a monolithic commit into progressive steps")
-    menu_table.add_row("[3]", "🔍 Stealth Audit", "Scan repository for bot/artificial commit patterns")
-    menu_table.add_row("[4]", "📊 Contribution Heatmap", "Preview contribution matrix without committing")
-    menu_table.add_row("[5]", "🩺 Repository Doctor", "Diagnose git configuration, author identity & system")
-    menu_table.add_row("[6]", "↩ Undo / Rollback", "Restore repository state to a previous safety checkpoint")
-    menu_table.add_row("[7]", "🎭 Behavior Profiles", "Explore standard, grinder, opensource profiles")
+    menu_table.add_row(
+        "[1]", "🚀 Backfill History", "Synthesize realistic commits across a date range"
+    )
+    menu_table.add_row(
+        "[2]", "🎬 Replay Commit", "Deconstruct a monolithic commit into progressive steps"
+    )
+    menu_table.add_row(
+        "[3]", "🔍 Stealth Audit", "Scan repository for bot/artificial commit patterns"
+    )
+    menu_table.add_row(
+        "[4]", "📊 Contribution Heatmap", "Preview contribution matrix without committing"
+    )
+    menu_table.add_row(
+        "[5]", "🩺 Repository Doctor", "Diagnose git configuration, author identity & system"
+    )
+    menu_table.add_row(
+        "[6]", "↩ Undo / Rollback", "Restore repository state to a previous safety checkpoint"
+    )
+    menu_table.add_row(
+        "[7]", "🎭 Behavior Profiles", "Explore standard, grinder, opensource profiles"
+    )
     menu_table.add_row("[q]", "🚪 Exit", "Close Mission Control")
 
     console.print(menu_table)
