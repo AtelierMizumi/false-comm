@@ -95,7 +95,7 @@ def run_mission_control(repo_path: Path | None = None, console: Console | None =
         "[6]", "↩ Undo / Rollback", "Restore repository state to a previous safety checkpoint"
     )
     menu_table.add_row(
-        "[7]", "🎭 Behavior Profiles", "Explore standard, grinder, opensource profiles"
+        "[7]", "🎭 Behavior Profiles", "Explore standard, grinder, opensource, student, comeback"
     )
     menu_table.add_row("[q]", "🚪 Exit", "Close Mission Control")
 
@@ -133,17 +133,42 @@ def run_mission_control(repo_path: Path | None = None, console: Console | None =
             from_str = Prompt.ask("Enter start date (e.g. 2024-01-01 or 120d)", console=console)
 
         prof_choice = Prompt.ask(
-            "Select profile:\n  [1] standard (balanced dev)\n  [2] grinder (high intensity)\n  [3] opensource (bursty PRs)\n  [4] student (evening/weekend)\nEnter choice",
-            choices=["1", "2", "3", "4"],
+            "Select profile:\n  [1] standard (balanced dev)\n  [2] grinder (high intensity)\n  [3] opensource (bursty PRs)\n  [4] student (evening/weekend)\n  [5] comeback (post-hiatus / summer catchup / ramp-up)\nEnter choice",
+            choices=["1", "2", "3", "4", "5"],
             default="1",
             console=console,
         )
-        prof_map = {"1": "standard", "2": "grinder", "3": "opensource", "4": "student"}
+        prof_map = {
+            "1": "standard",
+            "2": "grinder",
+            "3": "opensource",
+            "4": "student",
+            "5": "comeback",
+        }
         prof_name = prof_map[prof_choice]
+
+        intensity_choice = Prompt.ask(
+            "Select intensity:\n  [1] Normal (recommended)\n  [2] Light (subtle / casual)\n  [3] Heavy (dense sprint)\nEnter choice",
+            choices=["1", "2", "3"],
+            default="1",
+            console=console,
+        )
+        intensity_map = {"1": "normal", "2": "light", "3": "heavy"}
+        intensity_val = intensity_map[intensity_choice]
+
+        fill_gaps_choice = Prompt.ask(
+            "Target blank gap days only? (y/n)",
+            choices=["y", "n"],
+            default="y" if prof_name == "comeback" else "n",
+            console=console,
+        )
+        fill_gaps = fill_gaps_choice.lower() == "y"
 
         handle_backfill(
             from_date_str=from_str,
             profile_name=prof_name,
+            intensity=intensity_val,
+            fill_gaps=fill_gaps,
             repo_path=repo_path,
             console=console,
         )
@@ -193,14 +218,18 @@ def run_mission_control(repo_path: Path | None = None, console: Console | None =
         identity = adapter.get_git_identity()
         target_b = adapter.get_current_branch()
         rules = RepositoryRules(target_branch=target_b)
+        existing_counts = adapter.get_commit_counts_by_date(
+            start_date=start_d, end_date=end_d, branch=target_b
+        )
         planner = CommitPlanner(
             repo_root=adapter.get_repo_root(),
             profile=prof,
             identity=identity,
             rules=rules,
+            existing_commits=existing_counts,
         )
         plan = planner.generate_plan(date_range)
-        render_heatmap(plan, console=console)
+        render_heatmap(plan, console=console, existing_counts=existing_counts)
 
     elif choice == "5":
         # Doctor
@@ -227,6 +256,7 @@ def run_mission_control(repo_path: Path | None = None, console: Console | None =
                 p.name,
                 p.description,
                 f"{int(p.weekday_active_prob * 100)}% / {int(p.weekend_active_prob * 100)}%",
-                str(p.dispersion_r),
+                f"{p.dispersion_r:.1f}",
             )
+
         console.print(table)

@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from rich.console import Console
+from rich.prompt import Confirm
 from rich.table import Table
 
 from false_comm.git.adapter import GitAdapter
@@ -13,6 +14,7 @@ from false_comm.i18n import t
 def handle_undo(
     snapshot_id: str | None = None,
     list_all: bool = False,
+    auto_confirm: bool = False,
     repo_path: Path | None = None,
     console: Console | None = None,
 ) -> None:
@@ -50,6 +52,16 @@ def handle_undo(
             )
         console.print(table)
         return
+
+    if not auto_confirm:
+        target_name = snapshot_id or "latest"
+        confirm = Confirm.ask(
+            f"Are you sure you want to rollback repository state to snapshot '{target_name}'?",
+            default=False,
+        )
+        if not confirm:
+            console.print("[yellow]Rollback aborted by user.[/yellow]")
+            return
 
     # Perform rollback
     try:

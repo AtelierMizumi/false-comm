@@ -1,7 +1,7 @@
 """Commit planning coordinator assembling behavior, schedule, and content into an executable plan."""
 
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 from false_comm.content.generic import GenericContentStrategy
@@ -35,6 +35,10 @@ class CommitPlanner:
         rules: RepositoryRules | None = None,
         characteristics: RepoCharacteristics | None = None,
         seed: int | None = None,
+        intensity: float = 1.0,
+        no_vacation: bool = False,
+        fill_gaps: bool = False,
+        existing_commits: dict[date, int] | None = None,
     ) -> None:
         self.repo_root = repo_root
         self.profile = profile
@@ -44,7 +48,15 @@ class CommitPlanner:
         self.seed = seed
 
         self.holidays = HolidayCalendar(region=profile.holiday_region)
-        self.behavior = BehaviorEngine(profile=profile, holiday_calendar=self.holidays, seed=seed)
+        self.behavior = BehaviorEngine(
+            profile=profile,
+            holiday_calendar=self.holidays,
+            seed=seed,
+            intensity=intensity,
+            no_vacation=no_vacation,
+            fill_gaps=fill_gaps,
+            existing_commits=existing_commits,
+        )
         self.scheduler = ScheduleEngine(profile=profile, timezone_str=identity.timezone, seed=seed)
         self.messages = MessageGenerator(
             style=profile.message_style,

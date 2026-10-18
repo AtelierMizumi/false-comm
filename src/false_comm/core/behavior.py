@@ -57,10 +57,18 @@ class BehaviorEngine:
         profile: BehaviorProfile,
         holiday_calendar: HolidayCalendar | None = None,
         seed: int | None = None,
+        intensity: float = 1.0,
+        no_vacation: bool = False,
+        fill_gaps: bool = False,
+        existing_commits: dict[date, int] | None = None,
     ) -> None:
         self.profile = profile
         self.holiday_calendar = holiday_calendar or HolidayCalendar(region=profile.holiday_region)
         self.rng = random.Random(seed)
+        self.intensity = max(0.1, float(intensity))
+        self.no_vacation = no_vacation or (profile.vacation_weeks_per_year <= 0)
+        self.fill_gaps = fill_gaps
+        self.existing_commits = existing_commits or {}
 
     def _generate_vacation_dates(self, date_range: DateRange) -> set[date]:
         """Generate contiguous 7-day vacation blocks throughout each year in range."""
@@ -94,27 +102,58 @@ class BehaviorEngine:
 
     def plan_daily_commits(self, date_range: DateRange) -> list[DayCommitSpec]:
         """Compute commit count and burst structure for every day in date_range."""
-        vacations = self._generate_vacation_dates(date_range)
+        vacations = set() if self.no_vacation else self._generate_vacation_dates(date_range)
         results: list[DayCommitSpec] = []
 
+        total_days = max(1, (date_range.end_date - date_range.start_date).days + 1)
         curr_date = date_range.start_date
+        day_index = 0
+
         while curr_date <= date_range.end_date:
+            existing_count = self.existing_commits.get(curr_date, 0)
+
+            # In gap-filling mode: if day already has 3+ commits, preserve existing work without adding clutter
+            if self.fill_gaps and existing_count >= 3:
+                results.append(
+                    DayCommitSpec(
+                        target_date=curr_date, commit_count=0, is_burst_day=False, burst_groups=[]
+                    )
+                )
+                curr_date += timedelta(days=1)
+                day_index += 1
+                continue
+
             weekday = curr_date.weekday()  # Mon=0, Sun=6
             is_weekend = weekday >= 5
             is_holiday = self.holiday_calendar.is_holiday(curr_date)
             is_vacation = curr_date in vacations
 
+            # Organic ramp-up curve for post-hiatus / comeback profile
+            if self.profile.name == "comeback":
+                warmup_days = max(3, min(14, int(total_days * 0.25)))
+                ramp = 0.55 + 0.45 * min(1.0, day_index / max(1, warmup_days))
+            else:
+                ramp = 1.0
+
             # Determine if this day has activity
+            base_prob = (
+                self.profile.weekend_active_prob if is_weekend else self.profile.weekday_active_prob
+            )
+            if self.intensity != 1.0 or ramp != 1.0:
+                adjusted_prob = min(
+                    0.98, max(0.05, base_prob * (0.8 + 0.2 * self.intensity) * ramp)
+                )
+            else:
+                adjusted_prob = base_prob
+
             if is_vacation:
                 # 95% zero commits during vacation, 5% solitary quick commit
                 is_active = self.rng.random() < 0.05
             elif is_holiday:
                 # Holidays typically suppress commits
                 is_active = self.rng.random() < 0.04
-            elif is_weekend:
-                is_active = self.rng.random() < self.profile.weekend_active_prob
             else:
-                is_active = self.rng.random() < self.profile.weekday_active_prob
+                is_active = self.rng.random() < adjusted_prob
 
             if not is_active:
                 results.append(
@@ -123,9 +162,10 @@ class BehaviorEngine:
                     )
                 )
                 curr_date += timedelta(days=1)
+                day_index += 1
                 continue
 
-            # Scale dispersion / mean by weekday weight
+            # Scale dispersion / mean by weekday weight, intensity, and ramp
             weight = (
                 self.profile.weekday_weights[weekday]
                 if weekday < len(self.profile.weekday_weights)
@@ -135,13 +175,29 @@ class BehaviorEngine:
                 weight *= 0.5
 
             # Sample commit count from Negative Binomial with adjusted parameter
-            adjusted_r = max(0.5, self.profile.dispersion_r * weight)
+            adjusted_r = max(0.4, self.profile.dispersion_r * weight * self.intensity * ramp)
             raw_count = _sample_negative_binomial(adjusted_r, self.profile.prob_p, self.rng)
-            # Since is_active is True, day must have at least 1 commit
             commit_count = max(1, raw_count)
 
-            # Cap unreasonable spikes based on profile
-            max_daily = 18 if not is_weekend else 6
+            # In gap-filling mode, if day already had 1-2 commits, top up gently
+            if self.fill_gaps and existing_count > 0:
+                target_total = max(existing_count + 1, min(commit_count + existing_count, 4))
+                commit_count = max(0, target_total - existing_count)
+                if commit_count == 0:
+                    results.append(
+                        DayCommitSpec(
+                            target_date=curr_date,
+                            commit_count=0,
+                            is_burst_day=False,
+                            burst_groups=[],
+                        )
+                    )
+                    curr_date += timedelta(days=1)
+                    day_index += 1
+                    continue
+
+            # Cap unreasonable spikes based on profile and intensity
+            max_daily = int(18 * self.intensity) if not is_weekend else int(6 * self.intensity)
             commit_count = min(commit_count, max_daily)
 
             # Check for bursts (rapid succession of commits)
@@ -169,5 +225,6 @@ class BehaviorEngine:
                 )
             )
             curr_date += timedelta(days=1)
+            day_index += 1
 
         return results

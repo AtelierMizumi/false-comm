@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+from datetime import date, datetime
 from pathlib import Path
 
 from false_comm.models.config import GitIdentity
@@ -223,3 +224,38 @@ class GitAdapter:
         """Return the current reflog top entry."""
         res = self.run_git(["rev-parse", "HEAD@{0}"], check=False)
         return res.stdout.strip()
+
+    def get_commit_counts_by_date(
+        self,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        branch: str | None = None,
+    ) -> dict[date, int]:
+        """Return a mapping of date -> commit count from the repository log."""
+        cmd = ["log", "--format=%aI"]
+        if branch:
+            cmd.append(branch)
+        if start_date:
+            cmd.append(f"--since={start_date.isoformat()}T00:00:00")
+        if end_date:
+            cmd.append(f"--until={end_date.isoformat()}T23:59:59")
+
+        res = self.run_git(cmd, check=False)
+        counts: dict[date, int] = {}
+        if res.returncode != 0 or not res.stdout.strip():
+            return counts
+
+        for line in res.stdout.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                d = datetime.fromisoformat(line).date()
+                if start_date and d < start_date:
+                    continue
+                if end_date and d > end_date:
+                    continue
+                counts[d] = counts.get(d, 0) + 1
+            except ValueError:
+                continue
+        return counts

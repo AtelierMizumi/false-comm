@@ -20,6 +20,25 @@ from false_comm.models.config import DateRange, RepositoryRules
 from false_comm.utils.dates import resolve_date_range
 
 
+def parse_intensity(val: str | float | None) -> float:
+    """Parse string or numeric intensity into a float multiplier."""
+    if val is None:
+        return 1.0
+    if isinstance(val, (int, float)):
+        return max(0.1, float(val))
+    val_str = str(val).strip().lower()
+    if val_str in ("light", "low", "nhe"):
+        return 0.6
+    if val_str in ("normal", "medium", "vua", "standard"):
+        return 1.0
+    if val_str in ("heavy", "high", "manh", "dense"):
+        return 1.6
+    try:
+        return max(0.1, float(val_str))
+    except ValueError:
+        return 1.0
+
+
 def render_celebration_card(res: ExecutionResult, plan: CommitPlan, console: Console) -> None:
     """Render a rewarding completion card confirming safety and next actions."""
     content = Text()
@@ -71,6 +90,9 @@ def handle_backfill(
     author_name: str | None = None,
     author_email: str | None = None,
     timezone_str: str | None = None,
+    intensity: str | float | None = 1.0,
+    no_vacation: bool = False,
+    fill_gaps: bool = False,
     repo_path: Path | None = None,
     console: Console | None = None,
 ) -> None:
@@ -117,7 +139,13 @@ def handle_backfill(
         console.print(f"[bold red]{e}[/bold red]")
         return
 
+    # Get existing commits for preview and gap-aware planning
+    existing_counts = adapter.get_commit_counts_by_date(
+        start_date=start_d, end_date=end_d, branch=branch
+    )
+
     # Build plan
+    parsed_intensity = parse_intensity(intensity)
     rules = RepositoryRules(target_branch=branch)
     planner = CommitPlanner(
         repo_root=adapter.get_repo_root(),
@@ -125,6 +153,10 @@ def handle_backfill(
         identity=identity,
         rules=rules,
         seed=seed,
+        intensity=parsed_intensity,
+        no_vacation=no_vacation,
+        fill_gaps=fill_gaps,
+        existing_commits=existing_counts,
     )
 
     console.print(
@@ -133,7 +165,7 @@ def handle_backfill(
     plan = planner.generate_plan(date_range)
 
     # Render terminal heatmap and statistics
-    render_heatmap(plan, console=console)
+    render_heatmap(plan, console=console, existing_counts=existing_counts)
 
     if dry_run:
         console.print(f"[bold yellow]{t('backfill.dry_run_notice')}[/bold yellow]")
@@ -150,10 +182,14 @@ def handle_backfill(
             console.print(f"[yellow]{t('backfill.aborted')}[/yellow]")
             return
 
-    # Execute plan with progress bar
+    # Initialize snapshot manager and executor
     snapshot_mgr = SnapshotManager(adapter)
-    executor = PlanExecutor(git_adapter=adapter, snapshot_manager=snapshot_mgr)
+    executor = PlanExecutor(
+        git_adapter=adapter,
+        snapshot_manager=snapshot_mgr,
+    )
 
+    # Execute plan with progress bar
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
@@ -162,17 +198,19 @@ def handle_backfill(
         TimeRemainingColumn(),
         console=console,
     ) as progress:
-        task = progress.add_task(f"[cyan]{t('backfill.task_title')}", total=len(plan.commits))
+        task = progress.add_task(
+            f"[cyan]{t('backfill.task_title')}[/cyan]", total=len(plan.commits)
+        )
 
-        def on_progress(idx: int, total: int, commit: PlannedCommit) -> None:
-            short_msg = commit.message.splitlines()[0][:45]
+        def on_step(idx: int, total: int, commit: PlannedCommit) -> None:
+            clean_msg = commit.message.splitlines()[0][:50]
             progress.update(
                 task,
                 completed=idx,
-                description=f"[cyan]{t('backfill.commit_progress', idx=idx, total=total, msg='')}[/cyan][dim]{short_msg}[/dim]",
+                description=f"[cyan]{t('backfill.commit_progress', idx=idx, total=total, msg=clean_msg)}[/cyan]",
             )
 
-        res = executor.execute(plan, progress_callback=on_progress)
+        res = executor.execute(plan, progress_callback=on_step)
 
-    # Render celebration card
-    render_celebration_card(res, plan, console=console)
+    # Display celebration card
+    render_celebration_card(res, plan, console)

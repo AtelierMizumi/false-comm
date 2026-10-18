@@ -1,0 +1,38 @@
+name: "comeback"
+description: "Catch-up & comeback learner (post-hiatus gradual ramp-up, summer recovery, consistent learning sprints, flexible weekend work, zero synthetic vacations)"
+dispersion_r: 2.8
+prob_p: 0.48
+weekday_active_prob: 0.85
+weekend_active_prob: 0.50
+weekday_weights: [1.0, 1.1, 1.2, 1.1, 1.0, 0.7, 0.6]
+time_windows:
+  - name: "morning"
+    start_hour: 9
+    end_hour: 12
+    probability: 0.25
+    peak_hour: 10
+  - name: "afternoon"
+    start_hour: 14
+    end_hour: 18
+    probability: 0.45
+    peak_hour: 16
+  - name: "evening"
+    start_hour: 19
+    end_hour: 23
+    probability: 0.30
+    peak_hour: 21
+lunch_dip_start: 12
+lunch_dip_end: 13
+lunch_suppression_factor: 0.15
+burst_probability: 0.35
+burst_min_commits: 2
+burst_max_commits: 5
+burst_gap_minutes_min: 5
+burst_gap_minutes_max: 30
+vacation_weeks_per_year: 0
+holiday_region: "GLOBAL"
+message_style: "conventional"
+multiline_message_prob: 0.20
+branch_simulation_enabled: true
+branch_ratio: 0.15
+merge_commit_enabled: true
