@@ -83,7 +83,7 @@ makepkg -si
 Download the pre-compiled `.deb` package from the [GitHub Releases](https://github.com/AtelierMizumi/false-comm/releases) page:
 ```bash
 # Download latest release package
-sudo dpkg -i false-comm_2.0.0_amd64.deb
+sudo dpkg -i false-comm_2.1.0_amd64.deb
 
 # Or build locally
 ./packaging/scripts/build_deb.sh
@@ -95,7 +95,7 @@ sudo dpkg -i false-comm_2.0.0_amd64.deb
 Build and install via the native `.spec` file in `packaging/rpm/`:
 ```bash
 rpmbuild -ba packaging/rpm/false-comm.spec
-sudo dnf install ~/rpmbuild/RPMS/noarch/false-comm-2.0.0-1*.rpm
+sudo dnf install ~/rpmbuild/RPMS/noarch/false-comm-2.1.0-1*.rpm
 ```
 
 ---
@@ -337,7 +337,7 @@ cd packaging/arch && makepkg -si
 
 ### 3. Dành cho Ubuntu / Debian (.deb):
 ```bash
-sudo dpkg -i false-comm_2.0.0_amd64.deb
+sudo dpkg -i false-comm_2.1.0_amd64.deb
 ```
 
 ### 4. Binary độc lập (Không cần cài Python):

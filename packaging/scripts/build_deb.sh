@@ -7,7 +7,11 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
-VERSION="2.0.0"
+VERSION="$(cd "${REPO_ROOT}" && python3 -c 'import pathlib, tomllib; print(tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"])')"
+if [ -z "${VERSION}" ]; then
+    echo "Failed to read project version from pyproject.toml" >&2
+    exit 1
+fi
 ARCH="amd64"
 PKG_NAME="false-comm"
 DEB_DIR="${REPO_ROOT}/dist/deb/${PKG_NAME}_${VERSION}_${ARCH}"

@@ -1,5 +1,5 @@
 Name:           false-comm
-Version:        2.0.0
+Version:        2.1.0
 Release:        1%{?dist}
 Summary:        Realistic, stealth Git commit history synthesizer for developers
 
@@ -63,5 +63,10 @@ install -m 0644 packaging/man/false-comm.1 %{buildroot}%{_mandir}/man1/false-com
 %{_mandir}/man1/false-comm.1*
 
 %changelog
+* Sun Nov 01 2026 false-comm contributors <thuanc177@gmail.com> - 2.1.0-1
+- Add comeback profile, intensity controls, and gap-filling
+- Add replay dry-run preview and JSON plan export
+- Fix English target-branch label and Windows tzset compatibility
+
 * Sun Sep 29 2026 false-comm contributors <thuanc177@gmail.com> - 2.0.0-1
 - Initial 2.0.0 release of false-comm

@@ -1,6 +1,6 @@
 # Maintainer: false-comm contributors <thuanc177@gmail.com>
 pkgname=false-comm
-pkgver=2.0.0
+pkgver=2.1.0
 pkgrel=1
 pkgdesc="Realistic, stealth Git commit history synthesizer for developers"
 arch=('any')

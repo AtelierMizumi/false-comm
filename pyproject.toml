@@ -1,6 +1,6 @@
 [project]
 name = "false-comm"
-version = "2.0.0"
+version = "2.1.0"
 description = "Realistic, professional Git commit history synthesizer for stealth and perfectionism."
 readme = "README.md"
 requires-python = ">=3.12"

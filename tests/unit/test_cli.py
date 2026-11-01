@@ -15,7 +15,7 @@ def test_cli_version() -> None:
     result = runner.invoke(app, ["--version"])
     assert result.exit_code == 0
     assert "false-comm" in result.output
-    assert "version 2.0.0" in result.output
+    assert "version 2.1.0" in result.output
 
 
 def test_cli_profiles() -> None:
