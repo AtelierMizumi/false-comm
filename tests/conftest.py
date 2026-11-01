@@ -39,6 +39,30 @@ def git_adapter(temp_git_repo: Path) -> GitAdapter:
 
 
 @pytest.fixture
+def monolithic_commit(git_adapter: GitAdapter, temp_git_repo: Path) -> str:
+    """Create a single commit spanning all replay semantic phases."""
+    files = {
+        "models/user.py": "class User:\n    id: int\n    name: str\n",
+        "core/auth.py": "def authenticate():\n    return True\n",
+        "tests/test_auth.py": "def test_auth():\n    assert True\n",
+        "docs/api.md": "# Auth API\nDetails\n",
+    }
+    for relative_path, content in files.items():
+        target = temp_git_repo / relative_path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(content, encoding="utf-8")
+
+    git_adapter.add_files(list(files))
+    return git_adapter.commit(
+        message="feat: massive monolithic Sunday 3am commit",
+        author_date="2024-03-10T03:15:00 +0700",
+        committer_date="2024-03-10T03:15:00 +0700",
+        author_name="Dev",
+        author_email="dev@example.com",
+    )
+
+
+@pytest.fixture
 def snapshot_manager(git_adapter: GitAdapter) -> SnapshotManager:
     return SnapshotManager(git_adapter)
 
