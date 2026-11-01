@@ -193,6 +193,27 @@ false-comm replay HEAD --span 7d
 
 # Or deconstruct a specific commit SHA
 false-comm replay a1b2c3d --span 5d --profile grinder
+
+# Preview the partition without modifying the repository
+false-comm replay HEAD --span 7d --dry-run
+
+# Export the partition plan as JSON for automation / CI
+false-comm replay HEAD --span 7d --json
+```
+
+`--json` implies `--dry-run`: it only prints the plan and never creates commits,
+branches, or safety snapshots. The preview is fully non-interactive, so it can be
+safely used in scripts:
+
+```json
+{
+  "commit": "a1b2c3d",
+  "span_days": 5,
+  "total_steps": 4,
+  "steps": [
+    {"step_index": 1, "phase": "interface_schema", "message": "feat(models): ...", "files": ["models/user.py"]}
+  ]
+}
 ```
 
 ---

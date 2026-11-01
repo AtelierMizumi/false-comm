@@ -1,5 +1,6 @@
 """Replay command rewriting a monolithic commit into a multi-day atomic progression."""
 
+import json
 from pathlib import Path
 
 from rich.console import Console
@@ -10,9 +11,34 @@ from false_comm.core.profile import ProfileRegistry
 from false_comm.git.adapter import GitAdapter
 from false_comm.git.snapshot import SnapshotManager
 from false_comm.i18n import t
-from false_comm.replay.analyzer import ReplayAnalyzer
-from false_comm.replay.repartitioner import DiffRepartitioner
+from false_comm.replay.analyzer import CommitDiffAnalysis, ReplayAnalyzer
+from false_comm.replay.repartitioner import DiffRepartitioner, ReplayStep
 from false_comm.replay.replayer import CommitReplayer
+
+
+def build_replay_plan_payload(
+    commit_ref: str,
+    analysis: CommitDiffAnalysis,
+    steps: list[ReplayStep],
+    span_days: int,
+) -> dict[str, object]:
+    """Build a machine-readable replay plan without touching the repository."""
+    return {
+        "commit": commit_ref,
+        "original_message": analysis.original_message,
+        "span_days": span_days,
+        "total_files": analysis.total_files,
+        "total_steps": len(steps),
+        "steps": [
+            {
+                "step_index": step.step_index,
+                "phase": step.phase.value,
+                "message": step.message,
+                "files": list(step.files),
+            }
+            for step in steps
+        ],
+    }
 
 
 def handle_replay(
@@ -20,6 +46,8 @@ def handle_replay(
     span: str = "7d",
     profile_name: str = "standard",
     auto_confirm: bool = False,
+    dry_run: bool = False,
+    json_output: bool = False,
     repo_path: Path | None = None,
     console: Console | None = None,
 ) -> None:
@@ -54,6 +82,17 @@ def handle_replay(
         console.print(f"[yellow]{t('replay.no_files', ref=commit_ref)}[/yellow]")
         return
 
+    # Machine-readable plan export: never mutates the repository.
+    if json_output:
+        payload = build_replay_plan_payload(
+            commit_ref=commit_ref,
+            analysis=analysis,
+            steps=steps,
+            span_days=span_days,
+        )
+        print(json.dumps(payload, indent=2, ensure_ascii=False))
+        return
+
     # Show preview table
     title_str = t("replay.preview_title", ref=commit_ref[:8], count=len(steps), span=span_days)
     table = Table(
@@ -72,6 +111,10 @@ def handle_replay(
         table.add_row(f"#{s.step_index}", s.phase.value, s.message, files_str)
 
     console.print(table)
+
+    if dry_run:
+        console.print(f"[bold yellow]{t('replay.dry_run_notice')}[/bold yellow]")
+        return
 
     if not auto_confirm:
         prompt_str = t(

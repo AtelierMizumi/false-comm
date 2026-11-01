@@ -276,6 +276,21 @@ def replay(
     profile: Annotated[
         str, typer.Option("--profile", "-p", help="Behavior profile to use for scheduling")
     ] = "standard",
+    dry_run: Annotated[
+        bool,
+        typer.Option(
+            "--dry-run",
+            "-d",
+            help="Preview replay steps without creating commits, branches, or snapshots",
+        ),
+    ] = False,
+    json_output: Annotated[
+        bool,
+        typer.Option(
+            "--json",
+            help="Emit the replay plan as JSON (implies --dry-run; never modifies the repo)",
+        ),
+    ] = False,
     yes: Annotated[bool, typer.Option("--yes", "-y", help="Skip confirmation prompt")] = False,
     repo_path: Annotated[
         Path | None, typer.Option("--repo", "-r", help="Path to Git repository")
@@ -287,6 +302,8 @@ def replay(
         span=span,
         profile_name=profile,
         auto_confirm=yes,
+        dry_run=dry_run,
+        json_output=json_output,
         repo_path=repo_path,
         console=console,
     )

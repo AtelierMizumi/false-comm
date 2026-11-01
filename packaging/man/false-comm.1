@@ -33,8 +33,10 @@ Render a terminal contribution heatmap grid and statistical metrics without comm
 \fBbackfill\fR \fB\-\-from\fR \fIDATE\fR \fB\-\-to\fR \fIDATE\fR [\fIOPTIONS\fR]
 Synthesize historical commits over a specified date range.
 .TP
-\fBreplay\fR \fICOMMIT_REF\fR [\fI\-\-span SPAN\fR] [\fI\-\-profile PROFILE\fR]
+\fBreplay\fR \fICOMMIT_REF\fR [\fI\-\-span SPAN\fR] [\fI\-\-profile PROFILE\fR] [\fI\-\-dry\-run\fR] [\fI\-\-json\fR]
 Deconstruct a monolithic commit into realistic progressive atomic commits over business days.
+Use \fB\-\-dry\-run\fR to preview the partition without creating commits, branches, or snapshots.
+Use \fB\-\-json\fR to emit the replay plan as machine-readable JSON; this implies \fB\-\-dry\-run\fR.
 .TP
 \fBundo\fR [\fI\-\-snapshot ID\fR] [\fI\-\-list\fR]
 Restore repository state to a previous pre-execution safety checkpoint.
