@@ -226,7 +226,7 @@ def test_backfill_cli_rejects_non_git_directory(tmp_path: Path) -> None:
     )
 
     assert result.exit_code == 0, result.output
-    assert "is not a valid Git repository" in result.output
+    assert "not a valid Git repository" in result.output
 
 
 def test_backfill_cli_rejects_invalid_date(temp_git_repo: Path) -> None:

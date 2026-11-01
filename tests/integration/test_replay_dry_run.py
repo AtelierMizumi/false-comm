@@ -157,4 +157,4 @@ def test_replay_dry_run_outside_git_repo(tmp_path: Path) -> None:
     )
 
     assert result.exit_code == 0, result.output
-    assert "is not a valid Git repository" in result.output
+    assert "not a valid Git repository" in result.output
