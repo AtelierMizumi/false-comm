@@ -60,3 +60,11 @@ ignore = ["E501"]
 testpaths = ["tests"]
 pythonpath = ["src"]
 addopts = "-v --tb=short"
+
+[tool.coverage.run]
+source = ["false_comm"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+skip_covered = true

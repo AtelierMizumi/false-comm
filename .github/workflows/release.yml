@@ -33,7 +33,7 @@ jobs:
           uv run ruff check .
           uv run ruff format --check .
           uv run mypy src
-          uv run pytest
+          uv run pytest --cov=false_comm --cov-fail-under=80
 
   build-wheels:
     name: Build Python Wheels & Sdist

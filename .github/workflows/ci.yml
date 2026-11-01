@@ -42,4 +42,4 @@ jobs:
         run: uv run mypy src
 
       - name: Run test suite
-        run: uv run pytest --cov=false_comm
+        run: uv run pytest --cov=false_comm --cov-fail-under=80
