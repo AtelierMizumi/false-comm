@@ -102,7 +102,7 @@ MESSAGES: dict[str, dict[str, str]] = {
         "celebrate.summary_title": "Mission Summary",
         "celebrate.commits_created": "Commits Created",
         "celebrate.time_span": "Timeline Spanned",
-        "celebrate.target_branch": "Nhánh Mục tiêu",
+        "celebrate.target_branch": "Target Branch",
         "celebrate.snapshot_id": "Safety Snapshot ID",
         "celebrate.safety_note": "Your repository was backed up before execution. Undo anytime with:",
         "celebrate.next_steps_title": "Recommended Next Actions",

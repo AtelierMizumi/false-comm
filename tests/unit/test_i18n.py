@@ -34,6 +34,11 @@ def test_parameter_interpolation() -> None:
     assert "Phiên bản false-comm 2.0.0" == res_vi
 
 
+def test_english_catalog_does_not_leak_vietnamese_labels() -> None:
+    mgr = I18nManager(initial_locale="en")
+    assert mgr.translate("celebrate.target_branch") == "Target Branch"
+
+
 def test_global_helpers() -> None:
     set_locale("en")
     assert get_locale() == "en"
