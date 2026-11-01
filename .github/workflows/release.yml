@@ -166,6 +166,12 @@ jobs:
           path: release-assets
           merge-multiple: true
 
+      - name: Flatten nested artifacts
+        working-directory: release-assets
+        run: |
+          find . -mindepth 2 -type f -exec mv -t . {} +
+          find . -mindepth 1 -type d -empty -delete
+
       - name: Generate Checksums
         working-directory: release-assets
         run: |
